@@ -1,0 +1,21 @@
+{
+  "name": "register",
+  "rank": "auntit17760001672331",
+  "request": {
+    "type": "http",
+    "url": "https://app.requestly.io/echo",
+    "scripts": {
+      "preRequest": "",
+      "postResponse": ""
+    },
+    "method": "GET",
+    "queryParams": [],
+    "headers": [],
+    "body": "",
+    "contentType": "text/plain",
+    "auth": {
+      "currentAuthType": "INHERIT",
+      "authConfigStore": {}
+    }
+  }
+}

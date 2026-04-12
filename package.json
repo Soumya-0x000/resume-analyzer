@@ -1,5 +1,5 @@
 {
-    "name": "Resume-Analyzer",
+    "name": "resume-analyzer",
     "version": "1.0.0",
     "description": "",
     "type": "module",
@@ -13,8 +13,11 @@
     "license": "ISC",
     "packageManager": "pnpm@10.33.0",
     "dependencies": {
+        "bcryptjs": "^3.0.3",
+        "cookie-parser": "^1.4.7",
         "dotenv": "^17.4.1",
         "express": "^5.2.1",
+        "jsonwebtoken": "^9.0.3",
         "mongoose": "^9.4.1"
     },
     "devDependencies": {
