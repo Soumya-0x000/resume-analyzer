@@ -1,21 +1,21 @@
 {
-  "name": "register",
-  "rank": "auntit17760001672331",
+  "name": "getMe",
   "request": {
     "type": "http",
-    "url": "{{base_url}}/auth/register",
+    "url": "{{base_url}}/auth/get-me",
     "scripts": {
       "preRequest": "",
       "postResponse": ""
     },
-    "method": "POST",
+    "method": "GET",
     "queryParams": [],
     "headers": [],
-    "body": "",
+    "body": "{\n  \n}",
     "contentType": "application/json",
     "auth": {
       "currentAuthType": "INHERIT",
       "authConfigStore": {}
     }
-  }
+  },
+  "rank": "aux"
 }

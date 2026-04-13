@@ -1,0 +1,11 @@
+{
+  "name": "Auth Environment",
+  "variables": {
+    "base_url": {
+      "value": "http://localhost:4000/api",
+      "type": "string",
+      "id": "549d0290-64b4-4faf-9bca-a736c30e4f1d",
+      "isSecret": false
+    }
+  }
+}

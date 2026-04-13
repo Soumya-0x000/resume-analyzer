@@ -1,21 +1,21 @@
 {
-  "name": "register",
-  "rank": "auntit17760001672331",
+  "name": "logout",
   "request": {
     "type": "http",
-    "url": "{{base_url}}/auth/register",
+    "url": "{{base_url}}/auth/logout",
     "scripts": {
       "preRequest": "",
       "postResponse": ""
     },
-    "method": "POST",
+    "method": "GET",
     "queryParams": [],
     "headers": [],
     "body": "",
-    "contentType": "application/json",
+    "contentType": "text/plain",
     "auth": {
       "currentAuthType": "INHERIT",
       "authConfigStore": {}
     }
-  }
+  },
+  "rank": "auu"
 }

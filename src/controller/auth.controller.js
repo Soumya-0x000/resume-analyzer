@@ -1,6 +1,9 @@
 import { generateToken } from '../lib/generateToken.js';
 import { sanitizeUser } from '../lib/sanitizeUser.js';
+import { sendError } from '../lib/sendError.js';
+import { sendResponse } from '../lib/sendResponse.js';
 import { setAuthCookie } from '../lib/setCookie.js';
+import BlacklistTokenModel from '../models/blacklist.model.js';
 import UserModel from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 
@@ -12,18 +15,24 @@ import bcrypt from 'bcryptjs';
  */
 const registerUserController = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username = '', email = '', password = '' } = req.body;
 
-        if (!username || !email || !password) {
-            return sendError(res, { status: 400, message: 'All fields are required' });
-        }
+        if (!username) return sendError(res, { status: 400, message: 'Username is required' });
+        if (!email) return sendError(res, { status: 400, message: 'Email is required' });
+        if (!password) return sendError(res, { status: 400, message: 'Password is required' });
 
         const isUserExists = await UserModel.findOne({
             $or: [{ username }, { email }],
         });
 
         if (isUserExists) {
-            return sendError(res, { status: 400, message: 'User already exists' });
+            if (isUserExists.username === username) {
+                return sendError(res, { status: 400, message: 'Username already taken' });
+            }
+
+            if (isUserExists.email === email) {
+                return sendError(res, { status: 400, message: 'Email already registered' });
+            }
         }
 
         const hashedPswd = await bcrypt.hash(password, 10);
@@ -75,8 +84,8 @@ const loginUserController = async (req, res) => {
             return sendError(res, { status: 401, message: 'Invalid password' });
         }
 
-        const token = generateToken(user);
-        setAuthCookie(res, token);
+        const accessToken = generateToken(user);
+        setAuthCookie(res, accessToken);
 
         sendResponse(res, {
             status: 200,
@@ -89,8 +98,54 @@ const loginUserController = async (req, res) => {
     }
 };
 
+/**
+ * @route POST /api/auth/logout
+ * @name logoutUserController
+ * @description Logout user
+ * @access Public
+ */
+const logoutUserController = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+
+        if (token) {
+            await BlacklistTokenModel.create({ token });
+        }
+        res.clearCookie('token');
+        sendResponse(res, {
+            status: 200,
+            message: 'User logged out successfully',
+        });
+    } catch (error) {
+        console.error('Error in logoutUserController:', error);
+        sendError(res, { status: 500, message: 'Server error' });
+    }
+};
+
+/**
+ * @route GET /api/auth/me
+ * @name getMeController
+ * @description Get current user
+ * @access Private
+ */
+const getMeController = async (req, res) => {
+    try {
+        const user = await UserModel.findById(req.user.id);
+        sendResponse(res, {
+            status: 200,
+            message: 'User fetched successfully',
+            data: sanitizeUser(user),
+        });
+    } catch (error) {
+        console.error('Error in getMeController:', error);
+        sendError(res, { status: 500, message: 'Server error' });
+    }
+};
+
 const authController = {
     registerUserController,
     loginUserController,
+    logoutUserController,
+    getMeController,
 };
 export default authController;
