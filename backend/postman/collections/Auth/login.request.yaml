@@ -1,0 +1,13 @@
+$kind: http-request
+name: login
+method: POST
+url: '{{base_url}}/auth/login'
+order: 2000
+headers: []
+body:
+  type: json
+  content: |-
+    {
+      "username": "SSD",
+      "password": "SSD@1234"
+    }
