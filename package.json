@@ -1,0 +1,20 @@
+{
+    "name": "resume-analyzer",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\""
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.33.0",
+    "devDependencies": {
+        "@types/node": "^24.10.1",
+        "concurrently": "^9.2.1",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3"
+    }
+}

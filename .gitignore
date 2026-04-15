@@ -1,0 +1,69 @@
+
+# ========================
+# Dependencies
+# ========================
+node_modules/
+**/node_modules/
+
+# pnpm store (optional but recommended)
+.pnpm-store/
+
+# ========================
+# Build outputs
+# ========================
+dist/
+build/
+out/
+coverage/
+
+# frontend build (Vite/React)
+frontend/dist/
+frontend/build/
+
+# backend build (if any transpilation later)
+backend/dist/
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ========================
+# Environment variables
+# ========================
+.env
+.env.*
+!.env.example
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# IDE
+# ========================
+.vscode/
+.idea/
+
+# ========================
+# Runtime caches
+# ========================
+.cache/
+.parcel-cache/
+.vite/
+
+# ========================
+# Testing
+# ========================
+coverage/
+
+# ========================
+# pnpm / lock safety (keep lock, ignore only if needed)
+# ========================
+# (DO NOT ignore pnpm-lock.yaml in normal projects)
