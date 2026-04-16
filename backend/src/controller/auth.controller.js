@@ -142,10 +142,29 @@ const getMeController = async (req, res) => {
     }
 };
 
+const updateMeController = async (req, res) => {
+    try {
+        const { username, email } = req.body;
+        const user = await UserModel.findById(req.user.id);
+        if (username) user.username = username;
+        if (email) user.email = email;
+        await user.save();
+        sendResponse(res, {
+            status: 200,
+            message: 'User updated successfully',
+            data: sanitizeUser(user),
+        });
+    } catch (error) {
+        console.error('Error in updateMeController:', error);
+        sendError(res, { status: 500, message: 'Server error' });
+    }
+};
+
 const authController = {
     registerUserController,
     loginUserController,
     logoutUserController,
     getMeController,
+    updateMeController,
 };
 export default authController;

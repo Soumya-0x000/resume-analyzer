@@ -26,10 +26,17 @@ authRouter.post('/login', authController.loginUserController);
 authRouter.get('/logout', authController.logoutUserController);
 
 /**
- * @route GET /api/auth/me
+ * @route GET /api/auth/get-me
  * @description Get current user
  * @access Private
  */
 authRouter.get('/get-me', authenticateUser, authController.getMeController);
+
+/**
+ * @route PATCH /api/auth/update-me
+ * @description Update current user
+ * @access Private
+ */
+authRouter.patch('/update-me', authenticateUser, authController.updateMeController);
 
 export default authRouter;
