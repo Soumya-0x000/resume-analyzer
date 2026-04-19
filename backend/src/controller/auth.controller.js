@@ -142,6 +142,12 @@ const getMeController = async (req, res) => {
     }
 };
 
+/**
+ * @route PUT /api/auth/me
+ * @name updateMeController
+ * @description Update current user
+ * @access Private
+ */
 const updateMeController = async (req, res) => {
     try {
         const { username, email } = req.body;

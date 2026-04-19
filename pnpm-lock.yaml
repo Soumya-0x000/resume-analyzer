@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@tanstack/react-query-devtools':
+        specifier: ^5.99.2
+        version: 5.99.2(@tanstack/react-query@5.99.2(react@19.2.5))(react@19.2.5)
     devDependencies:
       '@types/node':
         specifier: ^24.10.1
@@ -179,6 +183,23 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@tanstack/query-core@5.99.2':
+    resolution: {integrity: sha512-1HunU0bXVsR1ZJMZbcOPE6VtaBJxsW809RE9xPe4Gz7MlB0GWwQvuTPhMoEmQ/hIzFKJ/DWAuttIe7BOaWx0tA==}
+
+  '@tanstack/query-devtools@5.99.2':
+    resolution: {integrity: sha512-TEF1d+RYO9l8oeCwgzmOHIgKwAzXQmw2s/ny2bW8qeg2OMkkLjALfVEivgCMR3OL/jVdMmeTPX56WrV+uvYJFg==}
+
+  '@tanstack/react-query-devtools@5.99.2':
+    resolution: {integrity: sha512-8txkK9A9XBNTB8RoxVgfp6W3qwBr25tNP10L4yu3KuyhAdEvccECfIRzesSwMVk/wpVVioAr+hbMtUkMMF+WVw==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.99.2
+      react: ^18 || ^19
+
+  '@tanstack/react-query@5.99.2':
+    resolution: {integrity: sha512-vM91UEe45QUS9ED6OklsVL15i8qKcRqNwpWzPTVWvRPRSEgDudDgHpvyTjcdlwHcrKNa80T+xXYcchT2noPnZA==}
+    peerDependencies:
+      react: ^18 || ^19
+
   '@types/node@24.12.2':
     resolution: {integrity: sha512-A1sre26ke7HDIuY/M23nd9gfB+nrmhtYyMINbjI1zHJxYteKR6qSMX56FsmjMcDb3SMcjJg5BiRRgOCC/yBD0g==}
 
@@ -241,6 +262,10 @@ packages:
   is-fullwidth-code-point@3.0.0:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
     engines: {node: '>=8'}
+
+  react@19.2.5:
+    resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
+    engines: {node: '>=0.10.0'}
 
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
@@ -388,6 +413,21 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
+  '@tanstack/query-core@5.99.2': {}
+
+  '@tanstack/query-devtools@5.99.2': {}
+
+  '@tanstack/react-query-devtools@5.99.2(@tanstack/react-query@5.99.2(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@tanstack/query-devtools': 5.99.2
+      '@tanstack/react-query': 5.99.2(react@19.2.5)
+      react: 19.2.5
+
+  '@tanstack/react-query@5.99.2(react@19.2.5)':
+    dependencies:
+      '@tanstack/query-core': 5.99.2
+      react: 19.2.5
+
   '@types/node@24.12.2':
     dependencies:
       undici-types: 7.16.0
@@ -469,6 +509,8 @@ snapshots:
   has-flag@4.0.0: {}
 
   is-fullwidth-code-point@3.0.0: {}
+
+  react@19.2.5: {}
 
   require-directory@2.1.1: {}
 
