@@ -1,53 +1,69 @@
-# Dependencies
-node_modules/
 
+# ========================
+# Dependencies
+# ========================
+node_modules/
+**/node_modules/
+
+# pnpm store (optional but recommended)
+.pnpm-store/
+
+# ========================
+# Build outputs
+# ========================
+dist/
+build/
+out/
+coverage/
+
+# frontend build (Vite/React)
+frontend/dist/
+frontend/build/
+
+# backend build (if any transpilation later)
+backend/dist/
+
+# ========================
 # Logs
-logs
+# ========================
+logs/
 *.log
-pnpm-debug.log*
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
+pnpm-debug.log*
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
+# ========================
 # Environment variables
+# ========================
 .env
 .env.*
 !.env.example
 
-# Build output
-dist/
-build/
-
-# Cache
-.cache/
-.next/
-.vite/
-
+# ========================
 # OS files
+# ========================
 .DS_Store
 Thumbs.db
 
-# IDE / Editor
+# ========================
+# IDE
+# ========================
 .vscode/
 .idea/
-*.swp
 
-# Coverage
+# ========================
+# Runtime caches
+# ========================
+.cache/
+.parcel-cache/
+.vite/
+
+# ========================
+# Testing
+# ========================
 coverage/
 
-# Temporary files
-tmp/
-temp/
-
-# Lock files (optional - usually keep pnpm-lock.yaml)
-# package-lock.json
-# yarn.lock
-
-# Misc
-*.tgz
+# ========================
+# pnpm / lock safety (keep lock, ignore only if needed)
+# ========================
+# (DO NOT ignore pnpm-lock.yaml in normal projects)

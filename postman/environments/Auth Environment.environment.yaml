@@ -1,0 +1,6 @@
+name: Auth Environment
+values:
+  - key: base_url
+    value: 'http://localhost:4000/api'
+    enabled: true
+color: 180
