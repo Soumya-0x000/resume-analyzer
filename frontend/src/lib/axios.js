@@ -1,31 +1,22 @@
 import axios from 'axios';
 
-const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000/api',
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
+const axiosStructure = {
+    baseURL: API_BASE_URL,
     withCredentials: true,
-    timeout: 7000,
-    timeoutErrorMessage: 'Request timed out',
-    responseType: 'json',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+};
 
-// request interceptor
-api.interceptors.request.use(
-    (config) => {
-        return config;
-    },
-    (error) => Promise.reject(error),
-);
+// ----------------------------------------------------------------------
+// 1. MAIN API INSTANCE
+// (Interceptors will be attached to this later in the AuthProvider)
+// ----------------------------------------------------------------------
+export const api = axios.create({ ...axiosStructure, timeout: 7000 });
 
-// response interceptor
-api.interceptors.response.use(
-    (response) => response.data,
-    (error) => {
-        const message = error?.response?.data?.message || error?.message || 'Something went wrong';
-        return Promise.reject(new Error(message));
-    },
-);
+// ----------------------------------------------------------------------
+// 2. NAKED AUTH API INSTANCE
+// (Used ONLY for refreshing tokens. NO interceptors will be attached here)
+// ----------------------------------------------------------------------
+export const authApi = axios.create(axiosStructure);
 
 export default api;
