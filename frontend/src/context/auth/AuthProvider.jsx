@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { api, authApi } from '@/lib/axios';
 import { useMe } from '@/features/auth/auth.queries'; // Adjust import path if needed
 import { AuthContext } from './AuthContext';
+import { Loader } from '@/components/ui/loader/Loader';
 
 const TOKEN_EXPIRY_BUFFER = 60; // seconds
 
@@ -145,8 +146,7 @@ export const AuthProvider = ({ children }) => {
     if (isLoading) {
         return (
             <div className="flex h-screen w-screen items-center justify-center">
-                {/* Replace this with your actual loading spinner if you have one */}
-                <p className="text-muted-foreground animate-pulse">Loading...</p>
+                <Loader />
             </div>
         );
     }

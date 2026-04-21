@@ -81,13 +81,20 @@ const Register = () => {
     }, []);
 
     // Form submission handler
-    const onSubmit = useCallback((data) => {
-        toast.promise(registerUser(data), {
-            loading: 'Registering...',
-            success: (res) => res.message,
-            error: (error) => error.message,
-        });
-    }, [registerUser]);
+    const onSubmit = useCallback(
+        (data) => {
+            toast.promise(registerUser(data), {
+                loading: 'Registering...',
+                success: (res) => {
+                    return res?.data?.message || "You're registered successfully";
+                },
+                error: (error) => {
+                    return error?.response?.data?.message || 'Registration failed';
+                },
+            });
+        },
+        [registerUser],
+    );
 
     // Helper function to determine if error should be shown
     const shouldShowError = useCallback(
