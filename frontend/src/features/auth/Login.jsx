@@ -94,8 +94,12 @@ const Login = memo(() => {
         async (data) => {
             toast.promise(loginUser(data), {
                 loading: 'Signing in...',
-                success: (res) => res.message,
-                error: (error) => error.message,
+                success: (res) => {
+                    return res?.data?.message || 'Successfully logged in!';
+                },
+                error: (error) => {
+                    return error.response?.data?.message || 'Failed to login. Please try again.';
+                },
             });
         },
         [loginUser],
