@@ -10,11 +10,14 @@ const allowedOrigins = ['http://localhost:5173', 'https://resume-analyzer-ai-phi
 app.use(
     cors({
         origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps, postman)
             if (!origin) return callback(null, true);
 
+            // Check if the origin is in the allowed list
             if (allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
+                // Block the request if the origin is not allowed
                 callback(new Error('Not allowed by CORS'));
             }
         },
