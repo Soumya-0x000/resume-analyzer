@@ -18,7 +18,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { memo } from 'react';
 import { EyeIcon } from 'lucide-react';
 import { Link } from 'react-router';
-import { useLogin } from './auth.queries';
+import { useLogin } from './services/auth.queries';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 

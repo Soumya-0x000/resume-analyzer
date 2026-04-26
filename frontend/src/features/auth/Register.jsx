@@ -15,7 +15,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Link } from 'react-router';
-import { useRegister } from './auth.queries';
+import { useRegister } from './services/auth.queries';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 

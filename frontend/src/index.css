@@ -129,10 +129,25 @@
     }
 }
 
-
 html,
 body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Autofill fix aligned with design tokens */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--input) inset !important;
+    box-shadow: 0 0 0 1000px var(--input) inset !important;
+
+    -webkit-text-fill-color: var(--foreground) !important;
+    caret-color: var(--foreground);
+
+    border-color: var(--border);
+
+    transition: background-color 9999s ease-in-out 0s;
 }

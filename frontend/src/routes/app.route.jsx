@@ -5,6 +5,7 @@ import { AppWrapper } from '@/AppWrapper';
 import { PublicRoute } from './PublicRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 import App from '@/App';
+import NotFound from '@/pages/NotFound';
 
 const routes = [
     {
@@ -15,7 +16,11 @@ const routes = [
                 element: <PublicRoute />,
                 children: [
                     {
-                        index: true,
+                        path: '/',
+                        element: <Login />,
+                    },
+                    {
+                        path: '/login',
                         element: <Login />,
                     },
                     {
@@ -36,6 +41,7 @@ const routes = [
             },
         ],
     },
+    { path: '*', element: <NotFound /> },
 ];
 
 export const AppRouter = createBrowserRouter(routes);

@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { toast } from 'sonner';
 
 import { api, authApi } from '@/lib/axios';
-import { useMe } from '@/features/auth/auth.queries'; // Adjust import path if needed
+import { useMe } from '@/features/auth/services/auth.queries'; // Adjust import path if needed
 import { AuthContext } from './AuthContext';
 import { Loader } from '@/components/ui/loader/Loader';
 
