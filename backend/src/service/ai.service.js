@@ -1,10 +1,10 @@
-import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
 // 1. Initialize the AI with your API key
-const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_GENAI_API_KEY,
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 const interviewReportSchema = z.object({
@@ -85,6 +85,7 @@ const interviewReportSchema = z.object({
     preparationPlan: z
         .array(
             z.object({
+                order: z.number().describe('Execution order of this phase starting from 1'),
                 phase: z
                     .string()
                     .describe(
@@ -104,54 +105,128 @@ const interviewReportSchema = z.object({
         ),
 });
 
+const normalize = (data) => {
+    const fixArray = (arr) =>
+        arr.map((item) => {
+            if (typeof item === 'string') {
+                try {
+                    return JSON.parse(item);
+                } catch {
+                    return item;
+                }
+            }
+            return item;
+        });
+
+    return {
+        ...data,
+        technicalQuestions: fixArray(data.technicalQuestions),
+        behavioralQuestions: fixArray(data.behavioralQuestions),
+        skillGaps: fixArray(data.skillGaps),
+        preparationPlan: fixArray(data.preparationPlan),
+    };
+};
+
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
-    const model = genAI.getGenerativeModel({
-        model: 'gemini-2.5-flash',
-    });
-
     const prompt = `
-        # ROLE
-        You are an elite Technical Recruiter and Interview Coach with 20+ years of experience in talent acquisition and performance coaching. Your specialty is "High-Stakes Gap Analysis"—identifying exactly where a candidate's profile meets, exceeds, or falls short of a Job Description (JD).
+        You are a senior technical recruiter.
 
-        # OBJECTIVE
-        Generate a hyper-personalized Interview Preparation Report in JSON format. Your goal is to transform the candidate from a "paper match" into a "top-tier performer" by providing them with strategic "Pivot Scripts" and tailored technical deep-dives.
+        TASK:
+        Generate an interview preparation report based on:
+        - Resume: ${resume}
+        - Self Description: ${selfDescription}
+        - Job Description: ${jobDescription || 'N/A'}
 
-        # INPUT DATA
-        - **Candidate Resume:** ${resume}
-        - **Candidate Self-Description:** ${selfDescription}
-        - **Target Job Description:** ${jobDescription}
+        OUTPUT RULES:
+        - Return ONLY valid JSON
+        - Follow structure EXACTLY
+        - No explanations, no extra text
 
-        # EXECUTION STEPS (Chain-of-Thought)
-        1. **The Delta Analysis:** Compare the JD's "Must-Haves" against the Resume. Identify the 3 most critical Skill Gaps.
-        2. **Technical Probing:** Select technical questions that aren't just "definitions" but "scenarios." Target the intersection of what the JD asks for and the candidate's actual listed projects.
-        3. **The Intent Reveal:** For every question, explain the "Interviewer's Secret Agenda"—what are they actually trying to find out?
-        4. **Behavioral Strategy:** Map the candidate's self-description and resume highlights to the soft skills demanded by the JD (e.g., leadership, conflict, or pace).
-        5. **The Roadmap:** Create a tiered preparation plan that prioritizes fixing "High-Severity" gaps first.
+        COUNTS:
+        - technicalQuestions: 5
+        - behavioralQuestions: 3
+        - skillGaps: 3
+        - preparationPlan: 3-5 steps
 
-        # GUIDELINES FOR CONTENT
-        - **Answers:** Do not provide generic answers. Use the candidate's specific projects (e.g., specific names, metrics, or technologies mentioned) to anchor the responses.
-        - **Tone:** Professional, direct, and highly tactical.
-        - **Skill Gaps:** If a candidate is missing a secondary skill, provide a "Pivot Statement" to help them redirect the interviewer to a strength they DO have.
+        STRUCTURE:
 
-        # OUTPUT INSTRUCTIONS
-        - Return ONLY valid JSON.
-        - Ensure all descriptions in the schema are fulfilled with high-density information.
-        - No conversational filler outside the JSON.
+        {
+        "matchScore": number (0-100),
+
+        "technicalQuestions": [
+            {
+                "question": string,
+                "intention": string,
+                "answer": string,
+                "complexity": "basic" | "intermediate" | "advanced"
+            }
+        ],
+
+        "behavioralQuestions": [
+            {
+                "question": string,
+                "intention": string,
+                "answer": string
+            }
+        ],
+
+        "skillGaps": [
+            {
+                "gap": string,
+                "severity": "low" | "medium" | "high",
+                "pivotStatement": string
+            }
+        ],
+
+        "preparationPlan": [
+            {
+                "order": number,
+                "phase": string,
+                "focusArea": string,
+                "actionItems": string[],
+                "successCriteria": string
+            }
+        ]
+        }
+
+        STRICT:
+        - Arrays must contain OBJECTS (not strings)
+        - No labels like "question", "gap" inside arrays
+        - No inline strings like "order: 1, phase: ..."
+        - actionItems MUST be array of strings
+        - order must be sequential (1,2,3...)
+
+        QUALITY:
+        - Technical questions = scenario-based
+        - Answers = include terminology + example + outcome
+        - Skill gaps = specific, not generic
+        - Behavioral = real experience based
     `;
 
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash', // Use 2.5 Flash as per your project requirement
-        contents: prompt,
-        config: {
-            responseMimeType: 'application/json',
-            // This SDK uses 'responseJsonSchema' exactly as you wrote it
-            responseJsonSchema: zodToJsonSchema(interviewReportSchema),
+    const response = await openai.chat.completions.create({
+        model: 'gpt-4.1-mini',
+        messages: [
+            {
+                role: 'user',
+                content: prompt,
+            },
+        ],
+        response_format: {
+            type: 'json_object',
         },
     });
 
-    // 3. In this SDK, response.text is a property, not a function
-    const recipe = JSON.parse(response.text);
-    console.log(recipe);
+    console.log('=====================================');
+
+    // Extract JSON text
+    const jsonString = response.choices[0]?.message?.content || '{}';
+    const cleaned = normalize(JSON.parse(jsonString));
+
+    // Re-validate with Zod to ensure type safety
+    const parsed = interviewReportSchema.parse(cleaned);
+
+    console.log(JSON.stringify(parsed, null, 2));
+    return parsed;
 }
 
 export { generateInterviewReport };
