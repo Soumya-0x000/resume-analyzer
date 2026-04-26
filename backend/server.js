@@ -6,7 +6,7 @@ import { generateInterviewReport } from './src/service/ai.service.js';
 
 await connectDB();
 
-generateInterviewReport({ resume, selfDescription, jobDescription });
+// generateInterviewReport({ resume, selfDescription, jobDescription });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
