@@ -1,9 +1,12 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { z } from 'zod';
 import { promptGenerator } from '../lib/promptGenerator.js';
+import { createCacheKey } from '../lib/cacheKey.js';
+import { getCache, setCache } from '../lib/cacheStore.js';
+import { callFnWithRetry } from '../lib/callFnWithRetry.js';
 
 const genAI = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_GENAI_API_KEY_2,
+    apiKey: process.env.GOOGLE_GENAI_API_KEY_1,
 });
 
 const interviewReportSchema = z.object({
@@ -107,20 +110,35 @@ const geminiResponseSchema = {
 };
 
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
+    const cacheKey = createCacheKey({ resume, selfDescription, jobDescription });
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+        return cachedData;
+    }
+
     const prompt = promptGenerator({ resume, selfDescription, jobDescription });
 
-    const response = await genAI.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-            responseMimeType: 'application/json',
-            responseSchema: geminiResponseSchema, // ✅ Use native schema, not zodToJsonSchema()
-        },
-    });
+    try {
+        const response = await callFnWithRetry(() =>
+            genAI.models.generateContent({
+                model: 'gemini-2.5-flash-lite',
+                contents: prompt,
+                config: {
+                    responseMimeType: 'application/json',
+                    responseSchema: geminiResponseSchema,
+                },
+            }),
+        );
 
-    console.log(response.text)
-    const parsed = interviewReportSchema.parse(JSON.parse(response.text));
-    return parsed;
+        const parsed = interviewReportSchema.parse(JSON.parse(response.text));
+
+        setCache(cacheKey, parsed, 1000 * 60 * 60 * 24 * 365);
+        return parsed;
+    } catch (err) {
+        console.error('AI ERROR:', err, err.message);
+        throw new Error('Failed to generate interview report');
+    }
 }
 
 export { generateInterviewReport };
