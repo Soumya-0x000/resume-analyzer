@@ -1,13 +1,12 @@
 $kind: http-request
 name: login
 method: POST
-url: '{{base_url}}/auth/login'
+url: "{{base_url}}/auth/login"
 order: 2000
-headers: []
 body:
   type: json
   content: |-
     {
-      "username": "SSD",
+      "email": "ssdas9041@gmail.com",
       "password": "SSD@1234"
     }

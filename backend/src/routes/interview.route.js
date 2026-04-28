@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import interviewController from '../controller/interview.controller.js';
 import authenticateUser from '../middlewares/auth.middleware.js';
 import upload from '../middlewares/file.middleware.js';
+import { interviewController } from '../controller/interview.controller.js';
 
 const interviewRouter = Router();
 
