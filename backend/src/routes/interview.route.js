@@ -17,4 +17,11 @@ interviewRouter.post(
     interviewController.generateInterviewReportController,
 );
 
+/**
+ * @route POST /api/interview/report/:interviewId
+ * @description get interview report by interviewId
+ * @access Private
+ */
+interviewRouter.get('/report/:interviewId', authenticateUser, )
+
 export default interviewRouter;
