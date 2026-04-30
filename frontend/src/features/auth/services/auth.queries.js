@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { login, register, logout, getMe, updateMe } from './auth.api';
+import { login, register, checkUsernameOrEmail, logout, getMe, updateMe } from './auth.api';
 
 const authKey = ['auth', 'me'];
 
@@ -45,6 +45,12 @@ export function useRegister() {
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: authKey });
         },
+    });
+}
+
+export function useCheckUsernameOrEmail() {
+    return useMutation({
+        mutationFn: checkUsernameOrEmail,
     });
 }
 

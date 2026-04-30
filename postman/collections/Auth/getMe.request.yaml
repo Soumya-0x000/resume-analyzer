@@ -1,11 +1,9 @@
 $kind: http-request
 name: getMe
 method: GET
-url: '{{base_url}}/auth/get-me'
+url: "{{base_url}}/auth/get-me"
 order: 4000
-headers: []
 auth:
   type: bearer
   credentials:
-    - key: token
-      value: '{{token}}'
+    token: "{{token}}"

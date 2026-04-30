@@ -1,5 +1,5 @@
 {
-    "name": "resume-analyzer",
+    "name": "resume_analyzer",
     "version": "1.0.0",
     "description": "",
     "type": "module",
@@ -11,7 +11,7 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
-    "packageManager": "pnpm@10.33.0",
+    "packageManager": "pnpm@10.33.2",
     "dependencies": {
         "@google/genai": "^1.50.1",
         "bcryptjs": "^3.0.3",
@@ -21,6 +21,8 @@
         "express": "^5.2.1",
         "jsonwebtoken": "^9.0.3",
         "mongoose": "^9.4.1",
+        "multer": "^2.1.1",
+        "pdfjs-dist": "^5.7.284",
         "zod": "^4.3.6",
         "zod-to-json-schema": "^3.25.2"
     },

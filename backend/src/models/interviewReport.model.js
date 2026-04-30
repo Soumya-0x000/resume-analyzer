@@ -56,7 +56,12 @@ const interviewReportSchema = new mongoose.Schema({
     behavioralQuestions: { type: [behavioralQuestionsSchema], default: [] },
     skillGaps: { type: [skillGapsSchema], default: [] },
     preparationPlan: { type: [preparationPlanSchema], default: [] },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+        required: [true, 'User is required'],
+    },
 });
 
-const InterviewReportModel = mongoose.model('InterviewReportModel', interviewReportSchema);
+const InterviewReportModel = mongoose.model('interviewReport', interviewReportSchema);
 export default InterviewReportModel;
