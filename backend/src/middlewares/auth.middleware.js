@@ -17,7 +17,7 @@ const authenticateUser = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Error in authenticateUser:', error);
-        sendError(res, { status: 500, message: 'Invalid token' });
+        return sendError(res, { status: 401, message: 'Unauthorized: Invalid or expired token' });
     }
 };
 

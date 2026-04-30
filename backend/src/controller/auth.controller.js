@@ -54,6 +54,65 @@ const registerUserController = async (req, res) => {
 };
 
 /**
+ * @route POST /api/auth/check-username-or-email
+ * @name checkUsernameOrEmailAvailability
+ * @description Check username or email availability
+ * @access Public
+ */
+const checkUsernameOrEmailAvailability = async (req, res) => {
+    try {
+        const { username, email } = req.body;
+
+        // 1. Email Regex Check
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (username && username.length < 3) {
+            return sendError(res, {
+                status: 400,
+                message: 'Username must be at least 3 characters long',
+            });
+        }
+
+        if (email && !emailRegex.test(email)) {
+            return sendError(res, { status: 400, message: 'Invalid email format' });
+        }
+
+        // 2. Optimized Query (Select only necessary fields)
+        const isUserExists = await UserModel.findOne({
+            $or: [...(username ? [{ username }] : []), ...(email ? [{ email }] : [])],
+        })
+            .collation({ locale: 'en', strength: 2 })
+            .select('username email')
+            .lean();
+
+        if (isUserExists) {
+            // Normalize both to lowercase for the comparison
+            const dbUsername = isUserExists.username?.toLowerCase();
+            const inputUsername = username?.toLowerCase();
+
+            const dbEmail = isUserExists.email?.toLowerCase();
+            const inputEmail = email?.toLowerCase();
+
+            if (username && dbUsername === inputUsername) {
+                return sendError(res, { status: 400, message: 'Username already taken' });
+            }
+
+            if (email && dbEmail === inputEmail) {
+                return sendError(res, { status: 400, message: 'Email already registered' });
+            }
+        }
+
+        sendResponse(res, {
+            status: 200,
+            message: 'Available',
+        });
+    } catch (error) {
+        console.error('Error in checkUsernameOrEmailAvailability:', error);
+        sendError(res, { status: 500, message: 'Server error' });
+    }
+};
+
+/**
  * @route POST /api/auth/login
  * @name loginUserController
  * @description Login user (expects username, password) and return JWT token
@@ -166,11 +225,20 @@ const updateMeController = async (req, res) => {
     }
 };
 
+/**
+ * @route POST /api/auth/recover-password
+ * @name recoverPassword
+ * @access Public
+ */
+const recoverPassword = () => {};
+
 const authController = {
     registerUserController,
+    checkUsernameOrEmailAvailability,
     loginUserController,
     logoutUserController,
     getMeController,
     updateMeController,
+    recoverPassword,
 };
 export default authController;

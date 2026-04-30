@@ -15,13 +15,17 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Link } from 'react-router';
-import { useRegister } from './services/auth.queries';
+import { useCheckUsernameOrEmail, useRegister } from './services/auth.queries';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { debounce } from '@/lib/utils';
 
 const Register = () => {
     const { mutateAsync: registerUser, isPending: isRegisterPending } = useRegister();
+    const { mutateAsync: checkAvailability } = useCheckUsernameOrEmail();
 
+    const [isChecking, setIsChecking] = useState({ username: false, email: false });
     const [showPassword, setShowPassword] = useState(false);
     const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
@@ -56,6 +60,9 @@ const Register = () => {
 
     const {
         register,
+        watch,
+        setError,
+        clearErrors,
         handleSubmit,
         formState: { errors, touchedFields, dirtyFields },
     } = useForm({
@@ -69,6 +76,46 @@ const Register = () => {
             repeatPassword: '',
         },
     });
+
+    const debouncedCheck = useMemo(
+        () =>
+            debounce(async (field, value) => {
+                if (!value || value.length < 3) return;
+
+                setIsChecking((prev) => ({ ...prev, [field]: true }));
+
+                try {
+                    await checkAvailability({ [field]: value });
+                    clearErrors(field);
+                } catch (err) {
+                    setError(field, {
+                        type: 'manual',
+                        message: err?.response?.data?.message || `${field} is taken`,
+                    });
+                } finally {
+                    setIsChecking((prev) => ({ ...prev, [field]: false }));
+                }
+            }, 500),
+        [checkAvailability, clearErrors, setError],
+    );
+
+    // 2. Watch and trigger
+    const watchedUsername = watch('username');
+    const watchedEmail = watch('email');
+
+    useEffect(() => {
+        // Only trigger if Zod hasn't found a basic format error yet
+        if (watchedUsername && !errors.username) {
+            debouncedCheck('username', watchedUsername);
+        }
+    }, [watchedUsername, debouncedCheck, errors.username]);
+
+    useEffect(() => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(watchedEmail) && !errors.email) {
+            debouncedCheck('email', watchedEmail);
+        }
+    }, [watchedEmail, debouncedCheck, errors.email]);
 
     // Toggle password visibility
     const togglePasswordVisibility = useCallback(() => {
@@ -120,7 +167,14 @@ const Register = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         {/* Username Field */}
                         <div className="space-y-2">
-                            <Label htmlFor="username">Username</Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="username">Username</Label>
+                                {isChecking.username && (
+                                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                        <Loader2 size={10} className="animate-spin" /> Checking...
+                                    </span>
+                                )}
+                            </div>
                             <Input
                                 id="username"
                                 type="text"
@@ -139,7 +193,14 @@ const Register = () => {
 
                         {/* Email Field */}
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="email">Email</Label>
+                                {isChecking.email && (
+                                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                        <Loader2 size={10} className="animate-spin" /> Checking...
+                                    </span>
+                                )}
+                            </div>
                             <Input
                                 id="email"
                                 type="email"

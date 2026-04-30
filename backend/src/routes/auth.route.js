@@ -12,6 +12,13 @@ const authRouter = Router();
 authRouter.post('/register', authController.registerUserController);
 
 /**
+ * @route POST /api/auth/check-username-or-email
+ * @description Check username or email availability
+ * @access Public
+ */
+authRouter.post('/check-username-or-email', authController.checkUsernameOrEmailAvailability);
+
+/**
  * @route POST /api/auth/login
  * @description Login user and return JWT token
  * @access Public
@@ -38,5 +45,12 @@ authRouter.get('/get-me', authenticateUser, authController.getMeController);
  * @access Private
  */
 authRouter.patch('/update-me', authenticateUser, authController.updateMeController);
+
+/**
+ * @route POST /api/auth/recover-password
+ * @description Recover password
+ * @access Public
+ */
+authRouter.post('/recover-password', authController.recoverPassword);
 
 export default authRouter;
