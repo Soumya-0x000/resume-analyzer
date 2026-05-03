@@ -1,0 +1,12 @@
+$kind: http-request
+name: check username email
+url: "{{base_url}}/auth/check-username-or-email"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"ssdas9041@gmail.com\"\r
+
+    }"
+order: 3872242345535210

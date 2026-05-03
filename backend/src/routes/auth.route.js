@@ -53,4 +53,11 @@ authRouter.patch('/update-me', authenticateUser, authController.updateMeControll
  */
 authRouter.post('/recover-password', authController.recoverPassword);
 
+/**
+ * @route POST /api/auth/refresh-token
+ * @description Refresh token
+ * @access Public
+ */
+authRouter.post('/refresh-token', authController.refreshTokenController);
+
 export default authRouter;

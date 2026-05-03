@@ -39,13 +39,15 @@ const registerUserController = async (req, res) => {
 
         const user = await UserModel.create({ username, email, password: hashedPswd });
 
-        const token = generateToken(user);
-        setAuthCookie(res, token);
+        const refreshToken = generateToken(user, '7d');
+        setAuthCookie({ res, token: refreshToken });
+
+        const accessToken = generateToken(user, '15m');
 
         sendResponse(res, {
             status: 201,
             message: 'User registered successfully',
-            data: sanitizeUser(user),
+            data: { ...sanitizeUser(user), accessToken },
         });
     } catch (error) {
         console.error('Error in registerUserController:', error);
@@ -230,7 +232,54 @@ const updateMeController = async (req, res) => {
  * @name recoverPassword
  * @access Public
  */
-const recoverPassword = () => {};
+const recoverPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            return sendError(res, { status: 401, message: 'Invalid email' });
+        }
+        const token = generateToken(user);
+        res.redirect(`${process.env.CLIENT_URL}/reset-password?token=${token}`);
+        // sendResponse(res, {
+        //     status: 200,
+        //     message: 'Password reset link sent to your email',
+        // });
+    } catch (error) {
+        console.error('Error in recoverPassword:', error);
+        sendError(res, { status: 500, message: 'Server error' });
+    }
+};
+
+/**
+ * @route POST /api/auth/refresh-token
+ * @name refreshTokenController
+ * @access Public
+ */
+const refreshTokenController = async (req, res) => {
+    try {
+        const token = req.cookies.refreshToken;
+        if (!token) {
+            return sendError(res, { status: 401, message: 'No token provided' });
+        }
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await UserModel.findById(decodedToken.id);
+        if (!user) {
+            return sendError(res, { status: 401, message: 'Invalid token' });
+        }
+        const accessToken = generateToken(user);
+        const refreshToken = generateToken(user);
+        setAuthCookie(res, refreshToken);
+        sendResponse(res, {
+            status: 200,
+            message: 'Token refreshed successfully',
+            data: { ...sanitizeUser(user), accessToken },
+        });
+    } catch (error) {
+        console.error('Error in refreshTokenController:', error);
+        sendError(res, { status: 500, message: 'Server error' });
+    }
+};
 
 const authController = {
     registerUserController,
@@ -240,5 +289,6 @@ const authController = {
     getMeController,
     updateMeController,
     recoverPassword,
+    refreshTokenController,
 };
 export default authController;
