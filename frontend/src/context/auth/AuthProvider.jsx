@@ -8,6 +8,7 @@ import { api, authApi } from '@/lib/axios';
 import { useMe } from '@/features/auth/services/auth.queries'; // Adjust import path if needed
 import { AuthContext } from './AuthContext';
 import { Loader } from '@/components/ui/loader/Loader';
+import { useLogout } from '../../features/auth/services/auth.queries';
 
 const TOKEN_EXPIRY_BUFFER = 60; // seconds
 
@@ -28,6 +29,7 @@ const processQueue = (error, token = null) => {
 export const AuthProvider = ({ children }) => {
     const [authToken, setAuthToken] = useState(null);
     const queryClient = useQueryClient();
+    const { mutate: logout } = useLogout();
 
     // 1. Fetch User Data automatically on load
     // Because of the interceptors below, if this 401s on initial load,
@@ -37,13 +39,14 @@ export const AuthProvider = ({ children }) => {
     // 2. Centralized Logout Logic
     const logoutUser = useCallback(
         (message = 'Session Expired. Please login again.') => {
+            logout();
             setAuthToken(null);
             // Clear React Query cache so old user data doesn't persist
             queryClient.setQueryData(['auth', 'me'], null);
             queryClient.removeQueries({ queryKey: ['auth', 'me'] });
             toast.info(message);
         },
-        [queryClient],
+        [queryClient, logout],
     );
 
     // 3. The Master Interceptors

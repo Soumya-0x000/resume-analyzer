@@ -146,12 +146,15 @@ const loginUserController = async (req, res) => {
         }
 
         const accessToken = generateToken(user);
-        setAuthCookie(res, accessToken);
+        const refreshToken = generateToken(user);
+        setAuthCookie({ res, token: refreshToken });
+
+        const response = { ...sanitizeUser(user), accessToken };
 
         sendResponse(res, {
             status: 200,
             message: 'User logged in successfully',
-            data: sanitizeUser(user),
+            data: response,
         });
     } catch (error) {
         console.error('Error in loginUserController:', error);

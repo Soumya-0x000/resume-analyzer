@@ -16,10 +16,16 @@ export const setAuthCookie = ({
     expiresIn = 7 * 24 * 60 * 60 * 1000,
     tokenName = 'refreshToken',
 }) => {
+    const secure = process.env.NODE_ENV === 'production';
+
+    if (!res) {
+        throw new Error('setAuthCookie: res is required');
+    }
+
     res.cookie(tokenName, token, {
         httpOnly: true,
-        secure: !isDev,
-        sameSite: isDev ? 'lax' : 'strict',
+        secure,
+        sameSite: secure ? 'strict' : 'lax',
         maxAge: expiresIn,
     });
 };
