@@ -3,7 +3,7 @@ import { login, register, checkUsernameOrEmail, logout, getMe, updateMe } from '
 
 const authKey = ['auth', 'me'];
 
-export function useMe() {
+export function useMe(options = {}) {
     return useQuery({
         queryKey: authKey,
         queryFn: async () => {
@@ -12,6 +12,7 @@ export function useMe() {
         },
         retry: false,
         staleTime: 1000 * 60 * 10,
+        ...options,
     });
 }
 

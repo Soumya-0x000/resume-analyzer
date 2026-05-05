@@ -1,11 +1,11 @@
-import { generateToken } from '../lib/generateToken.js';
-import { sanitizeUser } from '../lib/sanitizeUser.js';
-import { sendError } from '../lib/sendError.js';
-import { sendResponse } from '../lib/sendResponse.js';
-import { setAuthCookie } from '../lib/setCookie.js';
-import BlacklistTokenModel from '../models/blacklist.model.js';
-import UserModel from '../models/user.model.js';
-import bcrypt from 'bcryptjs';
+import { generateToken } from "../lib/generateToken.js";
+import { sanitizeUser } from "../lib/sanitizeUser.js";
+import { sendError } from "../lib/sendError.js";
+import { sendResponse } from "../lib/sendResponse.js";
+import { setAuthCookie } from "../lib/setCookie.js";
+import BlacklistTokenModel from "../models/blacklist.model.js";
+import UserModel from "../models/user.model.js";
+import bcrypt from "bcryptjs";
 
 /**
  * @route POST /api/auth/register
@@ -15,11 +15,11 @@ import bcrypt from 'bcryptjs';
  */
 const registerUserController = async (req, res) => {
     try {
-        const { username = '', email = '', password = '' } = req.body;
+        const { username = "", email = "", password = "" } = req.body;
 
-        if (!username) return sendError(res, { status: 400, message: 'Username is required' });
-        if (!email) return sendError(res, { status: 400, message: 'Email is required' });
-        if (!password) return sendError(res, { status: 400, message: 'Password is required' });
+        if (!username) return sendError(res, { status: 400, message: "Username is required" });
+        if (!email) return sendError(res, { status: 400, message: "Email is required" });
+        if (!password) return sendError(res, { status: 400, message: "Password is required" });
 
         const isUserExists = await UserModel.findOne({
             $or: [{ username }, { email }],
@@ -27,11 +27,11 @@ const registerUserController = async (req, res) => {
 
         if (isUserExists) {
             if (isUserExists.username === username) {
-                return sendError(res, { status: 400, message: 'Username already taken' });
+                return sendError(res, { status: 400, message: "Username already taken" });
             }
 
             if (isUserExists.email === email) {
-                return sendError(res, { status: 400, message: 'Email already registered' });
+                return sendError(res, { status: 400, message: "Email already registered" });
             }
         }
 
@@ -39,19 +39,19 @@ const registerUserController = async (req, res) => {
 
         const user = await UserModel.create({ username, email, password: hashedPswd });
 
-        const refreshToken = generateToken(user, '7d');
+        const refreshToken = generateToken(user, "7d");
         setAuthCookie({ res, token: refreshToken });
 
-        const accessToken = generateToken(user, '15m');
+        const accessToken = generateToken(user, "15m");
 
         sendResponse(res, {
             status: 201,
-            message: 'User registered successfully',
+            message: "User registered successfully",
             data: { ...sanitizeUser(user), accessToken },
         });
     } catch (error) {
-        console.error('Error in registerUserController:', error);
-        res.status(500).json({ message: 'Server error' });
+        console.error("Error in registerUserController:", error);
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -71,20 +71,20 @@ const checkUsernameOrEmailAvailability = async (req, res) => {
         if (username && username.length < 3) {
             return sendError(res, {
                 status: 400,
-                message: 'Username must be at least 3 characters long',
+                message: "Username must be at least 3 characters long",
             });
         }
 
         if (email && !emailRegex.test(email)) {
-            return sendError(res, { status: 400, message: 'Invalid email format' });
+            return sendError(res, { status: 400, message: "Invalid email format" });
         }
 
         // 2. Optimized Query (Select only necessary fields)
         const isUserExists = await UserModel.findOne({
             $or: [...(username ? [{ username }] : []), ...(email ? [{ email }] : [])],
         })
-            .collation({ locale: 'en', strength: 2 })
-            .select('username email')
+            .collation({ locale: "en", strength: 2 })
+            .select("username email")
             .lean();
 
         if (isUserExists) {
@@ -96,21 +96,21 @@ const checkUsernameOrEmailAvailability = async (req, res) => {
             const inputEmail = email?.toLowerCase();
 
             if (username && dbUsername === inputUsername) {
-                return sendError(res, { status: 400, message: 'Username already taken' });
+                return sendError(res, { status: 400, message: "Username already taken" });
             }
 
             if (email && dbEmail === inputEmail) {
-                return sendError(res, { status: 400, message: 'Email already registered' });
+                return sendError(res, { status: 400, message: "Email already registered" });
             }
         }
 
         sendResponse(res, {
             status: 200,
-            message: 'Available',
+            message: "Available",
         });
     } catch (error) {
-        console.error('Error in checkUsernameOrEmailAvailability:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        console.error("Error in checkUsernameOrEmailAvailability:", error);
+        sendError(res, { status: 500, message: "Server error" });
     }
 };
 
@@ -127,7 +127,7 @@ const loginUserController = async (req, res) => {
         if ((!username && !email) || !password) {
             return sendError(res, {
                 status: 400,
-                message: 'Username/email and password are required',
+                message: "Username/email and password are required",
             });
         }
 
@@ -136,13 +136,13 @@ const loginUserController = async (req, res) => {
         const user = await UserModel.findOne(query);
 
         if (!user) {
-            return sendError(res, { status: 401, message: 'Invalid credentials' });
+            return sendError(res, { status: 401, message: "Invalid credentials" });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return sendError(res, { status: 401, message: 'Invalid password' });
+            return sendError(res, { status: 401, message: "Invalid password" });
         }
 
         const accessToken = generateToken(user);
@@ -153,12 +153,12 @@ const loginUserController = async (req, res) => {
 
         sendResponse(res, {
             status: 200,
-            message: 'User logged in successfully',
+            message: "User logged in successfully",
             data: response,
         });
     } catch (error) {
-        console.error('Error in loginUserController:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        console.error("Error in loginUserController:", error);
+        sendError(res, { status: 500, message: "Server error" });
     }
 };
 
@@ -175,14 +175,14 @@ const logoutUserController = async (req, res) => {
         if (token) {
             await BlacklistTokenModel.create({ token });
         }
-        res.clearCookie('token');
+        res.clearCookie("token");
         sendResponse(res, {
             status: 200,
-            message: 'User logged out successfully',
+            message: "User logged out successfully",
         });
     } catch (error) {
-        console.error('Error in logoutUserController:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        console.error("Error in logoutUserController:", error);
+        sendError(res, { status: 500, message: "Server error" });
     }
 };
 
@@ -197,12 +197,12 @@ const getMeController = async (req, res) => {
         const user = await UserModel.findById(req.user.id);
         sendResponse(res, {
             status: 200,
-            message: 'User fetched successfully',
+            message: "User fetched successfully",
             data: sanitizeUser(user),
         });
     } catch (error) {
-        console.error('Error in getMeController:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        console.error("Error in getMeController:", error);
+        sendError(res, { status: 500, message: "Server error" });
     }
 };
 
@@ -221,12 +221,12 @@ const updateMeController = async (req, res) => {
         await user.save();
         sendResponse(res, {
             status: 200,
-            message: 'User updated successfully',
+            message: "User updated successfully",
             data: sanitizeUser(user),
         });
     } catch (error) {
-        console.error('Error in updateMeController:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        console.error("Error in updateMeController:", error);
+        sendError(res, { status: 500, message: "Server error" });
     }
 };
 
@@ -240,7 +240,7 @@ const recoverPassword = async (req, res) => {
         const { email } = req.body;
         const user = await UserModel.findOne({ email });
         if (!user) {
-            return sendError(res, { status: 401, message: 'Invalid email' });
+            return sendError(res, { status: 401, message: "Invalid email" });
         }
         const token = generateToken(user);
         res.redirect(`${process.env.CLIENT_URL}/reset-password?token=${token}`);
@@ -249,8 +249,8 @@ const recoverPassword = async (req, res) => {
         //     message: 'Password reset link sent to your email',
         // });
     } catch (error) {
-        console.error('Error in recoverPassword:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        console.error("Error in recoverPassword:", error);
+        sendError(res, { status: 500, message: "Server error" });
     }
 };
 
@@ -263,24 +263,24 @@ const refreshTokenController = async (req, res) => {
     try {
         const token = req.cookies.refreshToken;
         if (!token) {
-            return sendError(res, { status: 401, message: 'No token provided' });
+            return sendError(res, { status: 401, message: "No token provided" });
         }
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const user = await UserModel.findById(decodedToken.id);
         if (!user) {
-            return sendError(res, { status: 401, message: 'Invalid token' });
+            return sendError(res, { status: 401, message: "Invalid token" });
         }
         const accessToken = generateToken(user);
         const refreshToken = generateToken(user);
         setAuthCookie(res, refreshToken);
         sendResponse(res, {
             status: 200,
-            message: 'Token refreshed successfully',
+            message: "Token refreshed successfully",
             data: { ...sanitizeUser(user), accessToken },
         });
     } catch (error) {
-        console.error('Error in refreshTokenController:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        console.error("Error in refreshTokenController:", error);
+        sendError(res, { status: 500, message: "Server error" });
     }
 };
 

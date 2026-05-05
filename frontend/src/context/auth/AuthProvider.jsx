@@ -1,20 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { jwtDecode } from 'jwt-decode';
-import dayjs from 'dayjs';
-import { toast } from 'sonner';
-
-import { api, authApi } from '@/lib/axios';
-import { useMe } from '@/features/auth/services/auth.queries'; // Adjust import path if needed
-import { AuthContext } from './AuthContext';
-import { Loader } from '@/components/ui/loader/Loader';
-import { useLogout } from '../../features/auth/services/auth.queries';
+import { useState, useEffect, useCallback } from "react";
+import { jwtDecode } from "jwt-decode";
+import dayjs from "dayjs";
+import { toast } from "sonner";
+import { useLogout, useMe } from "@/features/auth/services/auth.queries";
+import api, { authApi } from "@/lib/axios";
+import { Loader } from "@/components/ui/loader/Loader";
+import { AuthContext } from "./AuthContext";
 
 const TOKEN_EXPIRY_BUFFER = 60; // seconds
 
-// -------------------------------------------------------------
-// GLOBAL QUEUE VARIABLES (Must remain outside the component)
-// -------------------------------------------------------------
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -28,36 +22,41 @@ const processQueue = (error, token = null) => {
 
 export const AuthProvider = ({ children }) => {
     const [authToken, setAuthToken] = useState(null);
-    const queryClient = useQueryClient();
-    const { mutate: logout } = useLogout();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    // 1. Fetch User Data automatically on load
-    // Because of the interceptors below, if this 401s on initial load,
-    // it will automatically try to refresh before failing!
     const { data: user, isLoading, isError } = useMe();
+    const { mutateAsync: logoutApi } = useLogout();
 
-    // 2. Centralized Logout Logic
-    const logoutUser = useCallback(
-        (message = 'Session Expired. Please login again.') => {
-            logout();
-            setAuthToken(null);
-            // Clear React Query cache so old user data doesn't persist
-            queryClient.setQueryData(['auth', 'me'], null);
-            queryClient.removeQueries({ queryKey: ['auth', 'me'] });
-            toast.info(message);
+    const logout = useCallback(
+        async (message = "Session Expired. Please login again.") => {
+            if (isLoggingOut) return;
+
+            try {
+                setIsLoggingOut(true);
+                setAuthToken(null);
+                await logoutApi();
+                toast.info(message);
+            } catch (error) {
+                console.error("Error logging out:", error);
+            } finally {
+                setIsLoggingOut(false);
+            }
         },
-        [queryClient, logout],
+        [isLoggingOut, logoutApi]
     );
 
-    // 3. The Master Interceptors
     useEffect(() => {
-        // LAYER 1: Request Interceptor
         const requestInterceptor = api.interceptors.request.use(
             async (config) => {
                 if (!authToken) return config;
 
                 const decodedJWT = jwtDecode(authToken);
-                const timeToExpire = dayjs.unix(decodedJWT.exp).diff(dayjs(), 'second');
+
+                // Fix 3: Guard against undefined exp
+                const timeToExpire =
+                    decodedJWT.exp !== undefined
+                        ? dayjs.unix(decodedJWT.exp).diff(dayjs(), "second")
+                        : 0;
 
                 if (timeToExpire > TOKEN_EXPIRY_BUFFER) {
                     config.headers.Authorization = `Bearer ${authToken}`;
@@ -67,7 +66,7 @@ export const AuthProvider = ({ children }) => {
                 if (!isRefreshing) {
                     isRefreshing = true;
                     try {
-                        const response = await authApi.post('/auth/refresh');
+                        const response = await authApi.post("/auth/refresh");
                         const newToken = response.data.accessToken;
 
                         setAuthToken(newToken);
@@ -76,7 +75,7 @@ export const AuthProvider = ({ children }) => {
                         return config;
                     } catch (error) {
                         processQueue(error, null);
-                        logoutUser();
+                        logout();
                         return Promise.reject(error);
                     } finally {
                         isRefreshing = false;
@@ -92,32 +91,37 @@ export const AuthProvider = ({ children }) => {
                         .catch((err) => Promise.reject(err));
                 }
             },
-            (error) => Promise.reject(error),
+            (error) => Promise.reject(error)
         );
 
-        // LAYER 2: Response Interceptor
         const responseInterceptor = api.interceptors.response.use(
             (response) => response,
             async (error) => {
                 const originalRequest = error.config;
 
                 if (error.response?.status === 401 && !originalRequest._retry) {
+                    if (!authToken || isLoggingOut) {
+                        return Promise.reject(error);
+                    }
+
                     if (isRefreshing) {
-                        return new Promise(function (resolve, reject) {
-                            failedQueue.push({ resolve, reject });
-                        })
-                            .then((token) => {
-                                originalRequest.headers.Authorization = `Bearer ${token}`;
-                                return api(originalRequest);
-                            })
-                            .catch((err) => Promise.reject(err));
+                        return new Promise(
+                            function (resolve, reject) {
+                                failedQueue.push({ resolve, reject });
+                            }
+                                .then((token) => {
+                                    originalRequest.headers.Authorization = `Bearer ${token}`;
+                                    return api(originalRequest);
+                                })
+                                .catch((err) => Promise.reject(err))
+                        );
                     }
 
                     originalRequest._retry = true;
                     isRefreshing = true;
 
                     try {
-                        const response = await authApi.post('/auth/refresh');
+                        const response = await authApi.post("/auth/refresh");
                         const newToken = response.data.accessToken;
 
                         setAuthToken(newToken);
@@ -127,7 +131,7 @@ export const AuthProvider = ({ children }) => {
                         return api(originalRequest);
                     } catch (refreshError) {
                         processQueue(refreshError, null);
-                        logoutUser();
+                        logout();
                         return Promise.reject(refreshError);
                     } finally {
                         isRefreshing = false;
@@ -135,17 +139,15 @@ export const AuthProvider = ({ children }) => {
                 }
 
                 return Promise.reject(error);
-            },
+            }
         );
 
-        // Cleanup to prevent memory leaks
         return () => {
             api.interceptors.request.eject(requestInterceptor);
             api.interceptors.response.eject(responseInterceptor);
         };
-    }, [authToken, logoutUser]);
+    }, [authToken, logout]);
 
-    // 4. Block rendering of routes until we know the user's initial state
     if (isLoading) {
         return (
             <div className="flex h-screen w-screen items-center justify-center">
@@ -161,7 +163,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         authToken,
         setAuthToken,
-        logoutUser,
+        logout,
     };
 
     return <AuthContext.Provider value={contextData}>{children}</AuthContext.Provider>;

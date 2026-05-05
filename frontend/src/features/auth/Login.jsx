@@ -25,7 +25,7 @@ import { Loader2 } from 'lucide-react';
 const Login = memo(() => {
     const { mutateAsync: loginUser, isPending: isLoginPending } = useLogin();
 
-    const [authMode, setAuthMode] = useState('username'); // 'username' or 'email'
+    const [authMode, setAuthMode] = useState('email'); // 'username' or 'email'
     const [showPassword, setShowPassword] = useState(false);
 
     // Dynamic zod schema based on auth mode
@@ -42,7 +42,7 @@ const Login = memo(() => {
         } else {
             return z.object({
                 ...baseSchema,
-                email: z.string().email('Invalid email format'),
+                email: z.email('Invalid email format'),
             });
         }
     }, [authMode]);
@@ -59,8 +59,8 @@ const Login = memo(() => {
         reValidateMode: 'onChange',
         defaultValues: {
             username: '',
-            email: '',
-            password: '',
+            email: 'ssdas9041@gmail.com',
+            password: 'SSD@1234',
         },
     });
 
