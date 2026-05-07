@@ -8,7 +8,7 @@ export function useMe(options = {}) {
         queryKey: authKey,
         queryFn: async () => {
             const res = await getMe();
-            return res.data;
+            return res?.data?.data;
         },
         retry: false,
         staleTime: 1000 * 60 * 10,
@@ -32,9 +32,9 @@ export function useLogin() {
 
     return useMutation({
         mutationFn: login,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: authKey });
-        },
+        // onSuccess: async () => {
+        //     await queryClient.invalidateQueries({ queryKey: authKey });
+        // },
     });
 }
 

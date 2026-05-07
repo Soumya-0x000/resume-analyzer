@@ -92,13 +92,13 @@ const Login = memo(() => {
     // Form submission handler
     const onSubmit = useCallback(
         async (data) => {
-            toast.promise(loginUser(data), {
-                loading: 'Signing in...',
-                success: (res) => {
-                    return res?.data?.message || 'Successfully logged in!';
+            const toastId = toast.loading('Signing in...');
+            await loginUser(data, {
+                onSuccess: () => {
+                    toast.success('Login successful', { id: toastId });
                 },
-                error: (error) => {
-                    return error.response?.data?.message || 'Failed to login. Please try again.';
+                onError: (error) => {
+                    toast.error(error.response?.data?.message || 'Login failed', { id: toastId });
                 },
             });
         },
