@@ -30,7 +30,7 @@ authRouter.post('/login', authController.loginUserController);
  * @description Logout user
  * @access Public
  */
-authRouter.get('/logout', authController.logoutUserController);
+authRouter.post('/logout', authController.logoutUserController);
 
 /**
  * @route GET /api/auth/get-me

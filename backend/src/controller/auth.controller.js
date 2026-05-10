@@ -1,12 +1,15 @@
+import mongoose from 'mongoose';
 import { generateToken } from '../lib/generateToken.js';
 import { sanitizeUser } from '../lib/sanitizeUser.js';
 import { sendError } from '../lib/sendError.js';
 import { sendResponse } from '../lib/sendResponse.js';
 import { setAuthCookie } from '../lib/setCookie.js';
 import BlacklistTokenModel from '../models/blacklist.model.js';
+import SessionModel from '../models/session.model.js';
 import UserModel from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { cryptoHash } from '../lib/cacheKey.js';
 
 /**
  * @route POST /api/auth/register
@@ -15,18 +18,30 @@ import jwt from 'jsonwebtoken';
  * @access Public
  */
 const registerUserController = async (req, res) => {
+    const mongoSession = await mongoose.startSession();
     try {
+        mongoSession.startTransaction();
         const { username = '', email = '', password = '' } = req.body;
 
-        if (!username) return sendError(res, { status: 400, message: 'Username is required' });
-        if (!email) return sendError(res, { status: 400, message: 'Email is required' });
-        if (!password) return sendError(res, { status: 400, message: 'Password is required' });
+        if (!username) {
+            await mongoSession.abortTransaction();
+            return sendError(res, { status: 400, message: 'Username is required' });
+        }
+        if (!email) {
+            await mongoSession.abortTransaction();
+            return sendError(res, { status: 400, message: 'Email is required' });
+        }
+        if (!password) {
+            await mongoSession.abortTransaction();
+            return sendError(res, { status: 400, message: 'Password is required' });
+        }
 
         const isUserExists = await UserModel.findOne({
             $or: [{ username }, { email }],
-        });
+        }).session(mongoSession);
 
         if (isUserExists) {
+            await mongoSession.abortTransaction();
             if (isUserExists.username === username) {
                 return sendError(res, { status: 400, message: 'Username already taken' });
             }
@@ -38,12 +53,28 @@ const registerUserController = async (req, res) => {
 
         const hashedPswd = await bcrypt.hash(password, 10);
 
-        const user = await UserModel.create({ username, email, password: hashedPswd });
+        const [user] = await UserModel.create([{ username, email, password: hashedPswd }], {
+            session: mongoSession,
+        });
 
-        const refreshToken = generateToken(user, '7d');
+        const refreshToken = generateToken({ user, expiresIn: '7d' });
+        const refreshTokenHash = cryptoHash(refreshToken);
+        const [session] = await SessionModel.create(
+            [
+                {
+                    userId: user._id,
+                    refreshTokenHash,
+                    ip: req.ip,
+                    userAgent: req.headers['user-agent'],
+                },
+            ],
+            { session: mongoSession },
+        );
+        await mongoSession.commitTransaction();
+
         setAuthCookie({ res, token: refreshToken });
 
-        const accessToken = generateToken(user, '15m');
+        const accessToken = generateToken({ user, expiresIn: '15m', sessionId: session._id });
 
         sendResponse(res, {
             status: 201,
@@ -51,8 +82,11 @@ const registerUserController = async (req, res) => {
             data: { ...sanitizeUser(user), accessToken },
         });
     } catch (error) {
+        await mongoSession.abortTransaction();
         console.error('Error in registerUserController:', error);
-        res.status(500).json({ message: 'Server error' });
+        sendError(res, { status: 500, message: 'Server error' });
+    } finally {
+        await mongoSession.endSession();
     }
 };
 
@@ -122,10 +156,14 @@ const checkUsernameOrEmailAvailability = async (req, res) => {
  * @access Public
  */
 const loginUserController = async (req, res) => {
+    const mongoSession = await mongoose.startSession();
+
     try {
+        mongoSession.startTransaction();
         const { username, email, password } = req.body;
 
         if ((!username && !email) || !password) {
+            await mongoSession.abortTransaction();
             return sendError(res, {
                 status: 400,
                 message: 'Username/email and password are required',
@@ -137,21 +175,40 @@ const loginUserController = async (req, res) => {
         const user = await UserModel.findOne(query);
 
         if (!user) {
+            await mongoSession.abortTransaction();
             return sendError(res, { status: 401, message: 'Invalid credentials' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
+            await mongoSession.abortTransaction();
             return sendError(res, { status: 401, message: 'Invalid password' });
         }
 
-        const accessToken = generateToken(user, '15m');
-        const refreshToken = generateToken(user, '7d');
+        const refreshToken = generateToken({ user, expiresIn: '7d' });
+        const refreshTokenHash = cryptoHash(refreshToken);
+        const [session] = await SessionModel.create(
+            [
+                {
+                    userId: user._id,
+                    refreshTokenHash,
+                    ip: req.ip,
+                    userAgent: req.headers['user-agent'],
+                },
+            ],
+            { session: mongoSession },
+        );
+        if (!session) {
+            await mongoSession.abortTransaction();
+            return sendError(res, { status: 500, message: 'Failed to create session' });
+        }
+
+        const accessToken = generateToken({ user, expiresIn: '15m', sessionId: session._id });
+        await mongoSession.commitTransaction();
         setAuthCookie({ res, token: refreshToken });
 
         const response = { ...sanitizeUser(user), accessToken };
-
         sendResponse(res, {
             status: 200,
             message: 'User logged in successfully',
@@ -170,20 +227,47 @@ const loginUserController = async (req, res) => {
  * @access Public
  */
 const logoutUserController = async (req, res) => {
+    const mongoSession = await mongoose.startSession();
     try {
-        const token = req.cookies.token;
+        mongoSession.startTransaction();
+        const refreshToken = req.cookies.refreshToken;
 
-        if (token) {
-            await BlacklistTokenModel.create({ token });
+        if (!refreshToken) {
+            await mongoSession.abortTransaction();
+            return sendError(res, {
+                status: 400,
+                message: 'Refresh token not found',
+            });
         }
-        res.clearCookie('token');
-        sendResponse(res, {
+        const refreshTokenHash = cryptoHash(refreshToken);
+
+        const session = await SessionModel.findOne({ refreshTokenHash, revoked: false }, null, {
+            session: mongoSession,
+        });
+        console.log(session);
+        if (!session) {
+            await mongoSession.abortTransaction();
+            return sendError(res, { status: 400, message: 'Invalid refresh token' });
+        }
+        session.revoked = true;
+        await session.save();
+
+        if (refreshToken) {
+            await BlacklistTokenModel.create([{ token: refreshToken }], { session: mongoSession });
+        }
+        await mongoSession.commitTransaction();
+
+        res.clearCookie('refreshToken');
+        return sendResponse(res, {
             status: 200,
             message: 'User logged out successfully',
         });
     } catch (error) {
+        await mongoSession.abortTransaction();
         console.error('Error in logoutUserController:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        return sendError(res, { status: 500, message: 'Server error' });
+    } finally {
+        await mongoSession.endSession();
     }
 };
 
@@ -243,7 +327,7 @@ const recoverPassword = async (req, res) => {
         if (!user) {
             return sendError(res, { status: 401, message: 'Invalid email' });
         }
-        const token = generateToken(user);
+        const token = generateToken({ user });
         res.redirect(`${process.env.CLIENT_URL}/reset-password?token=${token}`);
         // sendResponse(res, {
         //     status: 200,
@@ -261,27 +345,79 @@ const recoverPassword = async (req, res) => {
  * @access Public
  */
 const refreshTokenController = async (req, res) => {
+    const mongoSession = await mongoose.startSession();
+
     try {
-        const token = req.cookies.refreshToken;
-        if (!token) {
-            return sendError(res, { status: 401, message: 'No token provided' });
+        mongoSession.startTransaction();
+
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            await mongoSession.abortTransaction();
+
+            return sendError(res, { status: 401, message: 'No refresh token provided' });
         }
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await UserModel.findById(decodedToken.id);
+
+        let decodedToken;
+
+        try {
+            decodedToken = jwt.verify(refreshToken, process.env.JWT_SECRET);
+        } catch {
+            await mongoSession.abortTransaction();
+            return sendError(res, { status: 401, message: 'Invalid or expired refresh token' });
+        }
+
+        const refreshTokenHash = cryptoHash(refreshToken);
+
+        const session = await SessionModel.findOne(
+            { userId: decodedToken.userId, refreshTokenHash, revoked: false },
+            null,
+            { session: mongoSession },
+        );
+
+        if (!session) {
+            await mongoSession.abortTransaction();
+
+            return sendError(res, { status: 401, message: 'Invalid session' });
+        }
+
+        const user = await UserModel.findById(decodedToken.userId, null, {
+            session: mongoSession,
+        });
+
         if (!user) {
-            return sendError(res, { status: 401, message: 'Invalid token' });
+            await mongoSession.abortTransaction();
+
+            return sendError(res, { status: 401, message: 'User not found' });
         }
-        const accessToken = generateToken(user, '15m');
-        const refreshToken = generateToken(user, '7d');
-        setAuthCookie({ res, token: refreshToken });
-        sendResponse(res, {
+
+        const accessToken = generateToken({
+            userId: user._id,
+            expiresIn: '15m',
+            sessionId: session._id,
+        });
+
+        const newRefreshToken = generateToken({ userId: user._id, expiresIn: '7d' });
+        const newRefreshTokenHash = cryptoHash(newRefreshToken);
+
+        session.refreshTokenHash = newRefreshTokenHash;
+        await session.save({ session: mongoSession });
+
+        await mongoSession.commitTransaction();
+
+        setAuthCookie({ res, token: newRefreshToken });
+        return sendResponse(res, {
             status: 200,
             message: 'Token refreshed successfully',
             data: { ...sanitizeUser(user), accessToken },
         });
     } catch (error) {
+        if (mongoSession.inTransaction()) {
+            await mongoSession.abortTransaction();
+        }
         console.error('Error in refreshTokenController:', error);
-        sendError(res, { status: 500, message: 'Server error' });
+        return sendError(res, { status: 500, message: 'Server error' });
+    } finally {
+        await mongoSession.endSession();
     }
 };
 
