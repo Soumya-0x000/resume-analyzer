@@ -244,7 +244,6 @@ const logoutUserController = async (req, res) => {
         const session = await SessionModel.findOne({ refreshTokenHash, revoked: false }, null, {
             session: mongoSession,
         });
-        console.log(session);
         if (!session) {
             await mongoSession.abortTransaction();
             return sendError(res, { status: 400, message: 'Invalid refresh token' });
@@ -353,7 +352,6 @@ const refreshTokenController = async (req, res) => {
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
             await mongoSession.abortTransaction();
-
             return sendError(res, { status: 401, message: 'No refresh token provided' });
         }
 
@@ -367,39 +365,30 @@ const refreshTokenController = async (req, res) => {
         }
 
         const refreshTokenHash = cryptoHash(refreshToken);
-
         const session = await SessionModel.findOne(
-            { userId: decodedToken.userId, refreshTokenHash, revoked: false },
+            { userId: decodedToken.id, refreshTokenHash, revoked: false },
             null,
             { session: mongoSession },
         );
 
         if (!session) {
             await mongoSession.abortTransaction();
-
             return sendError(res, { status: 401, message: 'Invalid session' });
         }
 
-        const user = await UserModel.findById(decodedToken.userId, null, {
-            session: mongoSession,
-        });
+        const user = await UserModel.findById(decodedToken.id, null, { session: mongoSession });
 
         if (!user) {
             await mongoSession.abortTransaction();
-
             return sendError(res, { status: 401, message: 'User not found' });
         }
 
-        const accessToken = generateToken({
-            userId: user._id,
-            expiresIn: '15m',
-            sessionId: session._id,
-        });
+        const accessToken = generateToken({ user, expiresIn: '15m', sessionId: session._id });
 
-        const newRefreshToken = generateToken({ userId: user._id, expiresIn: '7d' });
-        const newRefreshTokenHash = cryptoHash(newRefreshToken);
+        const newRefreshToken = generateToken({ user, expiresIn: '7d' });
+        const newHashedRefreshToken = cryptoHash(newRefreshToken);
 
-        session.refreshTokenHash = newRefreshTokenHash;
+        session.refreshTokenHash = newHashedRefreshToken;
         await session.save({ session: mongoSession });
 
         await mongoSession.commitTransaction();
@@ -415,7 +404,7 @@ const refreshTokenController = async (req, res) => {
             await mongoSession.abortTransaction();
         }
         console.error('Error in refreshTokenController:', error);
-        return sendError(res, { status: 500, message: 'Server error' });
+        sendError(res, { status: 500, message: 'Server error' });
     } finally {
         await mongoSession.endSession();
     }
