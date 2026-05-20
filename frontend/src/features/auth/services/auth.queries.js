@@ -32,9 +32,9 @@ export function useLogin() {
 
     return useMutation({
         mutationFn: login,
-        // onSuccess: async () => {
-        //     await queryClient.invalidateQueries({ queryKey: authKey });
-        // },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: authKey });
+        },
     });
 }
 

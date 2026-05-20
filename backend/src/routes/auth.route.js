@@ -33,6 +33,13 @@ authRouter.post('/login', authController.loginUserController);
 authRouter.post('/logout', authController.logoutUserController);
 
 /**
+ * @route GET /api/auth/logout-all
+ * @description Logout user from all sessions
+ * @access Public
+ */
+authRouter.post('/logout-all', authController.logoutAllController);
+
+/**
  * @route GET /api/auth/get-me
  * @description Get current user
  * @access Private
