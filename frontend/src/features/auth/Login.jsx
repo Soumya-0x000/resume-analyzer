@@ -25,7 +25,7 @@ import { Loader2 } from 'lucide-react';
 const Login = memo(() => {
     const { mutateAsync: loginUser, isPending: isLoginPending } = useLogin();
 
-    const [authMode, setAuthMode] = useState('email'); // 'username' or 'email'
+    const [authMode, setAuthMode] = useState('username'); // 'username' or 'email'
     const [showPassword, setShowPassword] = useState(false);
 
     // Dynamic zod schema based on auth mode
@@ -42,7 +42,7 @@ const Login = memo(() => {
         } else {
             return z.object({
                 ...baseSchema,
-                email: z.email('Invalid email format'),
+                email: z.string().email('Invalid email format'),
             });
         }
     }, [authMode]);
@@ -91,14 +91,14 @@ const Login = memo(() => {
 
     // Form submission handler
     const onSubmit = useCallback(
-        async (data) => {
-            const toastId = toast.loading('Signing in...');
-            await loginUser(data, {
-                onSuccess: () => {
-                    toast.success('Login successful', { id: toastId });
+        (data) => {
+            toast.promise(loginUser(data), {
+                loading: 'Signing in...',
+                success: (res) => {
+                    return res?.data?.message || 'Successfully logged in!';
                 },
-                onError: (error) => {
-                    toast.error(error.response?.data?.message || 'Login failed', { id: toastId });
+                error: (error) => {
+                    return error.response?.data?.message || 'Failed to login. Please try again.';
                 },
             });
         },

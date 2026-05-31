@@ -68,7 +68,7 @@ const registerUserController = async (req, res) => {
                     userAgent: req.headers["user-agent"],
                 },
             ],
-            { session: mongoSession }
+            { session: mongoSession },
         );
         await mongoSession.commitTransaction();
 
@@ -197,7 +197,7 @@ const loginUserController = async (req, res) => {
                     userAgent: req.headers["user-agent"],
                 },
             ],
-            { session: mongoSession }
+            { session: mongoSession },
         );
         if (!session) {
             await mongoSession.abortTransaction();
@@ -297,11 +297,10 @@ const logoutAllController = async (req, res) => {
             return sendError(res, { status: 400, message: "User ID not found" });
         }
 
-
         await SessionModel.updateMany(
             { userId, revoked: false },
             { revoked: true },
-            { session: mongoSession }
+            { session: mongoSession },
         );
         res.clearCookie("refreshToken");
         await mongoSession.commitTransaction();
@@ -326,7 +325,16 @@ const logoutAllController = async (req, res) => {
  */
 const getMeController = async (req, res) => {
     try {
+        if (!req.user || !req.user.id) {
+            return sendError(res, { status: 401, message: "Unauthorized" });
+        }
+
         const user = await UserModel.findById(req.user.id);
+
+        if (!user) {
+            return sendError(res, { status: 404, message: "User not found" });
+        }
+
         sendResponse(res, {
             status: 200,
             message: "User fetched successfully",
@@ -416,7 +424,7 @@ const refreshTokenController = async (req, res) => {
         const session = await SessionModel.findOne(
             { userId: decodedToken.id, refreshTokenHash, revoked: false },
             null,
-            { session: mongoSession }
+            { session: mongoSession },
         );
 
         if (!session) {

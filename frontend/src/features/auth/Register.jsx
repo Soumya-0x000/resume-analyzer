@@ -104,18 +104,19 @@ const Register = () => {
     const watchedEmail = watch('email');
 
     useEffect(() => {
-        // Only trigger if Zod hasn't found a basic format error yet
         if (watchedUsername && !errors.username) {
             debouncedCheck('username', watchedUsername);
         }
-    }, [watchedUsername, debouncedCheck, errors.username]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [watchedUsername]);
 
     useEffect(() => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (emailRegex.test(watchedEmail) && !errors.email) {
             debouncedCheck('email', watchedEmail);
         }
-    }, [watchedEmail, debouncedCheck, errors.email]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [watchedEmail]);
 
     // Toggle password visibility
     const togglePasswordVisibility = useCallback(() => {
