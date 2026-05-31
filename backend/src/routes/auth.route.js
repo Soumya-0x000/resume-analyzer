@@ -30,7 +30,14 @@ authRouter.post('/login', authController.loginUserController);
  * @description Logout user
  * @access Public
  */
-authRouter.get('/logout', authController.logoutUserController);
+authRouter.post('/logout', authController.logoutUserController);
+
+/**
+ * @route GET /api/auth/logout-all
+ * @description Logout user from all sessions
+ * @access Public
+ */
+authRouter.post('/logout-all', authController.logoutAllController);
 
 /**
  * @route GET /api/auth/get-me
@@ -52,5 +59,12 @@ authRouter.patch('/update-me', authenticateUser, authController.updateMeControll
  * @access Public
  */
 authRouter.post('/recover-password', authController.recoverPassword);
+
+/**
+ * @route POST /api/auth/refresh-token
+ * @description Refresh token
+ * @access Public
+ */
+authRouter.post('/refresh-token', authController.refreshTokenController);
 
 export default authRouter;

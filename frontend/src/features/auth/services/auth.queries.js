@@ -3,15 +3,16 @@ import { login, register, checkUsernameOrEmail, logout, getMe, updateMe } from '
 
 const authKey = ['auth', 'me'];
 
-export function useMe() {
+export function useMe(options = {}) {
     return useQuery({
         queryKey: authKey,
         queryFn: async () => {
             const res = await getMe();
-            return res.data;
+            return res?.data?.data;
         },
         retry: false,
         staleTime: 1000 * 60 * 10,
+        ...options,
     });
 }
 

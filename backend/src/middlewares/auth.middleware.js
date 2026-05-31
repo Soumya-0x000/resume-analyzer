@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import BlacklistTokenModel from '../models/blacklist.model.js';
 
 const authenticateUser = async (req, res, next) => {
-    const token = req.cookies.token;
+    const token = req.cookies.refreshToken;
 
     if (!token) return sendError(res, { status: 401, message: 'Token not provided' });
 

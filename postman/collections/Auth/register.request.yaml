@@ -1,9 +1,8 @@
 $kind: http-request
 name: register
 method: POST
-url: '{{base_url}}/auth/register'
+url: "{{base_url}}/auth/register"
 order: 1000
-headers: []
 body:
   type: json
   content: |-
@@ -11,4 +10,20 @@ body:
       "username": "SSD",
       "email": "ssdas9041@gmail.com",
       "password": "SSD@1234"
+    }
+  $type: |-
+    {
+        "type": "object",
+        "properties": {
+            "username": {
+                "type": "string"
+            },
+            "email": {
+                "type": "string",
+                "format": "email"
+            },
+            "password": {
+                "type": "string"
+            }
+        }
     }

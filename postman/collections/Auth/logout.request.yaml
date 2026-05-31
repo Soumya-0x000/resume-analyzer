@@ -1,6 +1,5 @@
 $kind: http-request
 name: logout
-method: GET
-url: '{{base_url}}/auth/logout'
+method: POST
+url: "{{base_url}}/auth/logout"
 order: 3000
-headers: []

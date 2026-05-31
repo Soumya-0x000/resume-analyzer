@@ -16,10 +16,6 @@ const routes = [
                 element: <PublicRoute />,
                 children: [
                     {
-                        path: '/',
-                        element: <Login />,
-                    },
-                    {
                         path: '/login',
                         element: <Login />,
                     },

@@ -53,6 +53,9 @@ export const AuthProvider = ({ children }) => {
             async (config) => {
                 if (!authToken) return config;
 
+                // Skip if Authorization was already set (e.g. by the response interceptor on a retry)
+                if (config.headers.Authorization) return config;
+
                 const decodedJWT = jwtDecode(authToken);
                 const timeToExpire = dayjs.unix(decodedJWT.exp).diff(dayjs(), 'second');
 

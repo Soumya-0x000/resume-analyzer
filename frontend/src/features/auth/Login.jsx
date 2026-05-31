@@ -59,8 +59,8 @@ const Login = memo(() => {
         reValidateMode: 'onChange',
         defaultValues: {
             username: '',
-            email: '',
-            password: '',
+            email: 'ssdas9041@gmail.com',
+            password: 'SSD@1234',
         },
     });
 
@@ -91,7 +91,7 @@ const Login = memo(() => {
 
     // Form submission handler
     const onSubmit = useCallback(
-        async (data) => {
+        (data) => {
             toast.promise(loginUser(data), {
                 loading: 'Signing in...',
                 success: (res) => {

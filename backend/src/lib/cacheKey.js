@@ -14,6 +14,10 @@ function normalize(input) {
     return String(input).trim();
 }
 
+export function cryptoHash(string) {
+    return crypto.createHash('sha256').update(string).digest('hex');
+}
+
 export function createCacheKey({ resume, selfDescription, jobDescription }) {
     const normalized = JSON.stringify({
         resume: normalize(resume),
@@ -21,5 +25,5 @@ export function createCacheKey({ resume, selfDescription, jobDescription }) {
         jobDescription: normalize(jobDescription),
     });
 
-    return crypto.createHash('sha256').update(normalized).digest('hex');
+    return cryptoHash(normalized);
 }
