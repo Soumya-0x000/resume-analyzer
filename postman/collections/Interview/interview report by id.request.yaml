@@ -1,4 +1,5 @@
 $kind: http-request
-url: ""
+name: interview report by id
+url: "{{base_url}}/interview/report/6a1c7c7dff968f39bf87df7c"
 method: GET
 order: 3835120372296173

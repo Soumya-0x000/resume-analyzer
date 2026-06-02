@@ -1,26 +1,27 @@
-import { createBrowserRouter } from 'react-router';
-import Login from '@/features/auth/Login';
-import Register from '@/features/auth/Register';
-import { AppWrapper } from '@/AppWrapper';
-import { PublicRoute } from './PublicRoute';
-import { ProtectedRoute } from './ProtectedRoute';
-import App from '@/App';
-import NotFound from '@/pages/NotFound';
+import { createBrowserRouter } from "react-router";
+import Login from "@/features/auth/Login";
+import Register from "@/features/auth/Register";
+import { AppWrapper } from "@/AppWrapper";
+import { PublicRoute } from "./PublicRoute";
+import { ProtectedRoute } from "./ProtectedRoute";
+import App from "@/App";
+import NotFound from "@/pages/NotFound";
+import Home from "@/features/interview/pages/Home";
 
 const routes = [
     {
-        path: '/',
+        path: "/",
         element: <AppWrapper />,
         children: [
             {
                 element: <PublicRoute />,
                 children: [
                     {
-                        path: '/login',
+                        path: "/login",
                         element: <Login />,
                     },
                     {
-                        path: 'register',
+                        path: "register",
                         element: <Register />,
                     },
                 ],
@@ -29,15 +30,15 @@ const routes = [
                 element: <ProtectedRoute />,
                 children: [
                     {
-                        path: '',
+                        path: "",
                         element: <App />,
-                        children: [],
+                        children: [{ index: true, element: <Home /> }],
                     },
                 ],
             },
         ],
     },
-    { path: '*', element: <NotFound /> },
+    { path: "*", element: <NotFound /> },
 ];
 
 export const AppRouter = createBrowserRouter(routes);
