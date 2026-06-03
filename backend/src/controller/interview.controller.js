@@ -57,25 +57,34 @@ const generateInterviewReportController = async (req, res) => {
  */
 const getInterviewReportById = async (req, res) => {
     try {
-        const { userId  } = req.params;
+        const { userId } = req.params;
+        const { page = 1, offset = 10 } = req.query;
 
-        if (!userId) {
-            sendError(res, { status: 400, message: "User ID is required" });
-            return;
-        }
+        const pageNumber = Math.max(parseInt(page, 10), 1);
+        const limit = Math.max(parseInt(offset, 10), 1);
+        const skip = (pageNumber - 1) * limit;
 
-        const interviewReport = await InterviewReportModel.findOne({ user: userId });
-        console.log(interviewReport);
+        const filter = userId ? { user: userId } : {};
 
-        if (!interviewReport) {
-            sendError(res, { status: 404, message: "Interview report not found" });
-            return;
-        }
+        const interviewReports = await InterviewReportModel.find(filter)
+            .skip(skip)
+            .limit(limit)
+            .sort({ _id: -1 });
+
+        const total = await InterviewReportModel.countDocuments(filter);
 
         sendResponse(res, {
             status: 200,
-            message: "Interview report found",
-            data: interviewReport,
+            message: "Interview reports fetched",
+            data: {
+                items: interviewReports,
+                pagination: {
+                    page: pageNumber,
+                    offset: limit,
+                    total,
+                    hasNext: skip + interviewReports.length < total,
+                },
+            },
         });
     } catch (error) {
         console.error("Error in getInterviewReportById:", error);
