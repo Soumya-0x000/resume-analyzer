@@ -7,6 +7,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import App from "@/App";
 import NotFound from "@/pages/NotFound";
 import Home from "@/features/interview/pages/Home";
+import Interview from "@/features/interview/pages/Interview";
 
 const routes = [
     {
@@ -32,7 +33,10 @@ const routes = [
                     {
                         path: "",
                         element: <App />,
-                        children: [{ index: true, element: <Home /> }],
+                        children: [
+                            { index: true, element: <Home /> },
+                            { path: "reports", element: <Interview /> },
+                        ],
                     },
                 ],
             },

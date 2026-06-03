@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { generateInterviewReport, getInterviewReportById } from "./interview.api";
+import { useAuth } from "@/context/auth/useAuth";
 
 const interviewKey = ["interview"];
 
@@ -16,11 +17,14 @@ export function useGenerateInterviewReport() {
     });
 }
 
-export function useGetInterviewReportById(interviewId, options = {}) {
+export function useGetInterviewReportByUserId(options = {}) {
+    const { user } = useAuth();
+    const userId = user?.id;
+
     return useQuery({
-        queryKey: [...interviewKey, interviewId],
+        queryKey: [...interviewKey, userId],
         queryFn: async () => {
-            const res = await getInterviewReportById(interviewId);
+            const res = await getInterviewReportById(userId);
             return res?.data?.data;
         },
         retry: false,

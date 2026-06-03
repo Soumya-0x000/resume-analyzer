@@ -1,10 +1,11 @@
-import { Outlet } from "react-router";
-import { Sidebar } from "./components/layout/Sidebar/Sidebar";
-import { Topbar } from "./components/layout/Topbar/Topbar";
-import { useSidebarState } from "./hooks/useSidebarState";
+import { Outlet } from 'react-router'
 
-const App = () => {
-    const { collapsed, toggle } = useSidebarState();
+import { useSidebarState } from '@/hooks/useSidebarState'
+import { Sidebar } from './Sidebar/Sidebar'
+import { Topbar } from './Topbar/Topbar'
+
+export function AppShell() {
+    const { collapsed, toggle } = useSidebarState()
 
     return (
         <div className="flex h-screen w-full overflow-hidden">
@@ -16,7 +17,5 @@ const App = () => {
                 </main>
             </div>
         </div>
-    );
-};
-
-export default App;
+    )
+}

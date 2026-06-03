@@ -57,19 +57,21 @@ const generateInterviewReportController = async (req, res) => {
  */
 const getInterviewReportById = async (req, res) => {
     try {
-        const { interviewId } = req.params;
-        if (!interviewId) {
-            sendError(res, { status: 400, message: "Interview ID is required" });
+        const { userId  } = req.params;
+
+        if (!userId) {
+            sendError(res, { status: 400, message: "User ID is required" });
             return;
         }
 
-        const interviewReport = await InterviewReportModel.findById(interviewId);
+        const interviewReport = await InterviewReportModel.findOne({ user: userId });
+        console.log(interviewReport);
 
         if (!interviewReport) {
             sendError(res, { status: 404, message: "Interview report not found" });
             return;
         }
-        
+
         sendResponse(res, {
             status: 200,
             message: "Interview report found",

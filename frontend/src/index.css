@@ -49,6 +49,10 @@
 }
 
 :root {
+    --scrollbar-track: var(--background);
+    --scrollbar-thumb: var(--border);
+    --scrollbar-thumb-hover: var(--muted-foreground);
+
     --background: oklch(1 0 0);
     --foreground: oklch(0.141 0.005 285.823);
     --card: oklch(1 0 0);
@@ -134,6 +138,31 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Scrollbar — Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Scrollbar — WebKit/Blink */
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* Autofill fix aligned with design tokens */
