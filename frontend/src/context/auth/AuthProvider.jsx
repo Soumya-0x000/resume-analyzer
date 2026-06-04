@@ -40,7 +40,6 @@ export const AuthProvider = ({ children }) => {
             setAuthToken(null);
             // Clear React Query cache so old user data doesn't persist
             queryClient.setQueryData(['auth', 'me'], null);
-            queryClient.removeQueries({ queryKey: ['auth', 'me'] });
             toast.info(message);
         },
         [queryClient],

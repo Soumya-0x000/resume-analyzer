@@ -42,7 +42,7 @@ const Login = memo(() => {
         } else {
             return z.object({
                 ...baseSchema,
-                email: z.string().email('Invalid email format'),
+                email: z.email('Invalid email format'),
             });
         }
     }, [authMode]);

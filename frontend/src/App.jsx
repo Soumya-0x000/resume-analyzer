@@ -1,12 +1,20 @@
-import React from 'react';
-import { Outlet } from 'react-router';
+import { Outlet } from "react-router";
+import { Sidebar } from "./components/layout/Sidebar/Sidebar";
+import { Topbar } from "./components/layout/Topbar/Topbar";
+import { useSidebarState } from "./hooks/useSidebarState";
 
 const App = () => {
+    const { collapsed, toggle } = useSidebarState();
+
     return (
-        <div className="min-h-screen h-screen min-w-screen w-screen flex">
-            <main className="flex-1 w-full h-full">
-                <Outlet />
-            </main>
+        <div className="flex h-screen w-full overflow-hidden">
+            <Sidebar collapsed={collapsed} onToggle={toggle} />
+            <div className="flex flex-1 flex-col overflow-hidden">
+                <Topbar />
+                <main className="flex-1 overflow-y-auto">
+                    <Outlet />
+                </main>
+            </div>
         </div>
     );
 };

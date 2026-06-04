@@ -62,7 +62,6 @@ export function useLogout() {
         mutationFn: logout,
         onSuccess: () => {
             queryClient.setQueryData(authKey, null);
-            queryClient.removeQueries({ queryKey: authKey });
         },
     });
 }

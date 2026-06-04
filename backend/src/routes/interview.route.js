@@ -23,7 +23,7 @@ interviewRouter.post(
  * @access Private
  */
 interviewRouter.get(
-    "/report/:interviewId",
+    "/report/:userId",
     authenticateUser,
     interviewController.getInterviewReportById,
 );
