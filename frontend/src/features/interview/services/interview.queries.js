@@ -17,14 +17,14 @@ export function useGenerateInterviewReport() {
     });
 }
 
-export function useGetInterviewReportByUserId(options = {}) {
+export function useGetInterviewReportByUserId({ options = {}, pagination }) {
     const { user } = useAuth();
     const userId = user?.id;
 
     return useQuery({
-        queryKey: [...interviewKey, userId],
+        queryKey: [...interviewKey, userId, pagination],
         queryFn: async () => {
-            const res = await getInterviewReportById(userId);
+            const res = await getInterviewReportById({ userId, pagination });
             return res?.data?.data;
         },
         retry: false,
