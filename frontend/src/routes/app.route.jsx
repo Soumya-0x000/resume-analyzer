@@ -8,6 +8,7 @@ import App from "@/App";
 import NotFound from "@/pages/NotFound";
 import Home from "@/features/interview/pages/Home";
 import Interview from "@/features/interview/pages/Interview";
+import ReportDetail from "@/features/interview/pages/ReportDetail";
 
 const routes = [
     {
@@ -36,6 +37,7 @@ const routes = [
                         children: [
                             { index: true, element: <Home /> },
                             { path: "reports", element: <Interview /> },
+                            { path: "reports/:reportId", element: <ReportDetail /> },
                         ],
                     },
                 ],

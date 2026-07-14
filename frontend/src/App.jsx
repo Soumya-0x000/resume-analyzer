@@ -11,7 +11,7 @@ const App = () => {
             <Sidebar collapsed={collapsed} onToggle={toggle} />
             <div className="flex flex-1 flex-col overflow-hidden">
                 <Topbar />
-                <main className="flex-1 overflow-y-auto">
+                <main className="flex-1 overflow-hidden">
                     <Outlet />
                 </main>
             </div>

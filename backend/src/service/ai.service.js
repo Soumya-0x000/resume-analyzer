@@ -10,6 +10,7 @@ const genAI = new GoogleGenAI({
 });
 
 const interviewReportSchema = z.object({
+    title: z.string(),
     matchScore: z.number(),
     technicalQuestions: z.array(
         z.object({
@@ -47,6 +48,7 @@ const interviewReportSchema = z.object({
 const geminiResponseSchema = {
     type: Type.OBJECT,
     properties: {
+        title: { type: Type.STRING },
         matchScore: { type: Type.NUMBER },
         technicalQuestions: {
             type: Type.ARRAY,
@@ -101,6 +103,7 @@ const geminiResponseSchema = {
         },
     },
     required: [
+        'title',
         'matchScore',
         'technicalQuestions',
         'behavioralQuestions',
