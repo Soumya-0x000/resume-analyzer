@@ -24,7 +24,7 @@ const Interview = () => {
     const handleNext = () => setPagination((p) => ({ ...p, page: p.page + 1 }));
 
     return (
-        <div className="bg-background p-6 space-y-6">
+        <div className="bg-background p-6 space-y-6 h-full overflow-y-auto">
             {isLoading ? (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {Array.from({ length: 3 }).map((_, i) => (

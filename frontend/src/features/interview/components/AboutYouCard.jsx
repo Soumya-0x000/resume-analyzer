@@ -5,23 +5,23 @@ import { cn } from "@/lib/utils";
 import { MAX_SELF_DESC } from "./home.helpers";
 
 const AboutYouCard = ({ register, errors, selfDescValue }) => (
-    <Card className="">
+    <Card className="flex flex-col min-h-0 overflow-hidden">
         <CardHeader className="shrink-0 border-b">
             <div className="flex items-center gap-2.5">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
                     <User className="h-3.5 w-3.5 text-primary" />
                 </div>
                 <div>
-                    <CardTitle>About You</CardTitle>
+                    <CardTitle>About Me</CardTitle>
                     <CardDescription>Your background and key strengths</CardDescription>
                 </div>
             </div>
         </CardHeader>
-        <CardContent className="flex flex-1 flex-col pt-4">
+        <CardContent className="flex flex-1 flex-col pt-4 min-h-0 overflow-hidden">
             <Textarea
                 id="selfDescription"
                 placeholder="e.g. I'm a frontend developer with 3 years in React and TypeScript. I've led small teams, enjoy performance optimization, and have shipped features used by 50k+ users..."
-                className="h-36 flex-1 resize-none overflow-y-auto text-xs leading-relaxed"
+                className="flex-1 min-h-0 field-sizing-fixed resize-none overflow-y-auto text-xs leading-relaxed"
                 {...register("selfDescription")}
             />
             <div className="mt-2 flex items-center justify-between">

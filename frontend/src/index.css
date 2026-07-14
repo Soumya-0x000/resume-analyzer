@@ -1,13 +1,13 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
-@import '@fontsource-variable/jetbrains-mono';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/jetbrains-mono";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
     --font-heading: var(--font-mono);
-    --font-mono: 'JetBrains Mono Variable', monospace;
+    --font-mono: "JetBrains Mono Variable", monospace;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -163,6 +163,190 @@ body {
 
 *::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-thumb-hover);
+}
+
+/* ===== Auth morph transition ===== */
+@keyframes authExitLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-40px) scale(0.97);
+    }
+}
+@keyframes authExitRight {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(40px) scale(0.97);
+    }
+}
+@keyframes authEnterRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+@keyframes authEnterLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+@keyframes authTaglineFade {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-exit-left {
+    animation: authExitLeft 0.22s ease-in both;
+}
+.auth-exit-right {
+    animation: authExitRight 0.22s ease-in both;
+}
+.auth-enter-right {
+    animation: authEnterRight 0.32s ease-out both;
+}
+.auth-enter-left {
+    animation: authEnterLeft 0.32s ease-out both;
+}
+.auth-tagline-fade {
+    animation: authTaglineFade 0.45s ease-out both;
+}
+
+/* ===== Login page animations ===== */
+@keyframes loginFloat {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-9px);
+    }
+}
+
+@keyframes loginFloatSlow {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-14px);
+    }
+}
+
+@keyframes loginScan {
+    0% {
+        transform: translateY(10vh);
+    }
+    8% {
+        opacity: 0.55;
+    }
+    92% {
+        opacity: 0.55;
+    }
+    100% {
+        transform: translateY(90vh);
+    }
+}
+
+@keyframes loginPulse {
+    0%,
+    100% {
+        opacity: 0.75;
+    }
+    50% {
+        opacity: 0.25;
+    }
+}
+
+@keyframes loginBlink {
+    0%,
+    49% {
+        opacity: 1;
+    }
+    50%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes loginFadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-float {
+    animation: loginFloat 3s ease-in-out infinite;
+}
+
+.login-float-slow {
+    animation: loginFloatSlow 6s ease-in-out infinite;
+}
+
+.login-scan {
+    animation: loginScan 3.5s ease-in-out infinite alternate;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--primary) 20%,
+        var(--primary) 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 8px 2px var(--primary);
+    pointer-events: none;
+    z-index: 25;
+}
+
+.login-pulse {
+    animation: loginPulse 2.5s ease-in-out infinite;
+}
+
+.login-blink {
+    animation: loginBlink 1.1s step-end infinite;
+}
+
+.login-fade-in {
+    animation: loginFadeSlide 0.65s ease-out both;
+}
+
+.login-grid {
+    background-image:
+        linear-gradient(var(--primary) 1px, transparent 1px),
+        linear-gradient(90deg, var(--primary) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.04;
+    pointer-events: none;
 }
 
 /* Autofill fix aligned with design tokens */

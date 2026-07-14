@@ -160,17 +160,23 @@ const loginUserController = async (req, res) => {
 
     try {
         mongoSession.startTransaction();
-        const { username, email, password } = req.body;
+        const { identifier, password } = req.body;
 
-        if ((!username && !email) || !password) {
+        if (!identifier || !identifier.trim()) {
             await mongoSession.abortTransaction();
-            return sendError(res, {
-                status: 400,
-                message: "Username/email and password are required",
-            });
+            return sendError(res, { status: 400, message: "Username or email is required" });
         }
 
-        const query = username ? { username } : { email };
+        if (!password) {
+            await mongoSession.abortTransaction();
+            return sendError(res, { status: 400, message: "Password is required" });
+        }
+
+        const trimmedIdentifier = identifier.trim();
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedIdentifier);
+        const query = isEmail
+            ? { email: trimmedIdentifier.toLowerCase() }
+            : { username: trimmedIdentifier };
 
         const user = await UserModel.findOne(query);
 

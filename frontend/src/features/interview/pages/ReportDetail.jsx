@@ -41,7 +41,7 @@ const ReportDetail = () => {
     const date = formatDate(getDateFromObjectId(report._id));
 
     return (
-        <div className="space-y-6 bg-background p-6">
+        <div className="space-y-6 bg-background p-6 h-full overflow-y-auto">
             {/* Header */}
             <div className="flex items-start gap-3">
                 <Button

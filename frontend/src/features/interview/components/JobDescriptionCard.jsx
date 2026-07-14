@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { MAX_JOB_DESC } from "./home.helpers";
 
 const JobDescriptionCard = ({ register, errors, jobDescValue }) => (
-    <Card className="col-start-1 row-start-1 row-span-2 flex flex-col">
+    <Card className="col-start-1 row-start-1 row-span-2 flex flex-col min-h-0 overflow-hidden">
         <CardHeader className="shrink-0 border-b">
             <div className="flex items-center gap-2.5">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
@@ -17,11 +17,11 @@ const JobDescriptionCard = ({ register, errors, jobDescValue }) => (
                 </div>
             </div>
         </CardHeader>
-        <CardContent className="flex flex-1 flex-col pt-4">
+        <CardContent className="flex flex-1 flex-col pt-4 min-h-0 overflow-hidden">
             <Textarea
                 id="jobDescription"
                 placeholder="e.g. We are looking for a Senior Frontend Engineer with 5+ years of React experience, strong TypeScript skills, and experience with modern build tools..."
-                className="h-72 flex-1 resize-none overflow-y-auto text-xs leading-relaxed"
+                className="flex-1 min-h-0 field-sizing-fixed resize-none overflow-y-auto text-xs leading-relaxed"
                 {...register("jobDescription")}
             />
             <div className="mt-2 flex items-center justify-between">
