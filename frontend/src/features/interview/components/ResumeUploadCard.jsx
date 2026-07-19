@@ -1,7 +1,7 @@
 import { FileText, FileUp, AlertCircle, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { formatFileSize } from "./home.helpers";
+import { formatFileSize } from "../utils/home.helpers";
 
 const ResumeUploadCard = ({
     uploadedFile,
@@ -33,7 +33,9 @@ const ResumeUploadCard = ({
                     </div>
                     <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-medium">{uploadedFile.name}</p>
-                        <p className="text-xs text-muted-foreground">{formatFileSize(uploadedFile.size)}</p>
+                        <p className="text-xs text-muted-foreground">
+                            {formatFileSize(uploadedFile.size)}
+                        </p>
                     </div>
                     <button
                         type="button"
@@ -77,7 +79,9 @@ const ResumeUploadCard = ({
                         <p className="text-xs font-medium">
                             {dragActive ? "Drop your PDF here" : "Drag & drop your resume"}
                         </p>
-                        <p className="text-xs text-muted-foreground">PDF · max 10 MB · or click to browse</p>
+                        <p className="text-xs text-muted-foreground">
+                            PDF · max 10 MB · or click to browse
+                        </p>
                     </div>
                     <input
                         ref={fileInputRef}

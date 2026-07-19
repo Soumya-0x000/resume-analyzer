@@ -1,24 +1,27 @@
+import { useState } from "react";
 import { ArrowLeft, Calendar, Code2, MessageSquare } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 import ScoreGauge from "../components/ScoreGauge";
 import SkillGapsChart from "../components/SkillGapsChart";
 import QuestionsOverview from "../components/QuestionsOverview";
 import QuestionsSection from "../components/QuestionsSection";
 import PrepPlanTimeline from "../components/PrepPlanTimeline";
-import {
-    extractJobTitle,
-    formatDate,
-    getDateFromObjectId,
-} from "../components/report.helpers";
+import { extractJobTitle, formatDate, getDateFromObjectId } from "../utils/report.helpers";
 
 const ReportDetail = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
     const report = state?.report;
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    const handleScroll = (e) => {
+        setIsScrolled(e.currentTarget.scrollTop > 8);
+    };
 
     if (!report) {
         return (
@@ -41,21 +44,44 @@ const ReportDetail = () => {
     const date = formatDate(getDateFromObjectId(report._id));
 
     return (
-        <div className="space-y-6 bg-background p-6 h-full overflow-y-auto">
+        <div
+            className="space-y-6 bg-background p-6 pt-0 h-full overflow-y-auto"
+            onScroll={handleScroll}
+        >
             {/* Header */}
-            <div className="flex items-start gap-3">
+            <div
+                className={cn(
+                    "flex items-start gap-3 sticky top-0 z-10 bg-background pt-4 pb-2 transition-all duration-200",
+                    isScrolled && "gap-2 pt-2 pb-1.5",
+                )}
+            >
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={() => navigate("/reports")}
-                    className="mt-0.5 shrink-0 gap-1.5"
+                    className={cn(
+                        "mt-0.5 shrink-0 gap-1.5 transition-all duration-200",
+                        isScrolled && "h-7 px-2.5",
+                    )}
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Back
                 </Button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="truncate text-xl font-semibold tracking-tight">{title}</h1>
-                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                    <h1
+                        className={cn(
+                            "truncate font-semibold tracking-tight transition-all duration-200",
+                            isScrolled ? "text-base" : "text-xl",
+                        )}
+                    >
+                        {title}
+                    </h1>
+                    <div
+                        className={cn(
+                            "mt-1 flex items-center gap-1 text-xs text-muted-foreground transition-all duration-200",
+                            isScrolled && "mt-0 h-0 overflow-hidden opacity-0",
+                        )}
+                    >
                         <Calendar className="h-3 w-3 shrink-0" />
                         {date}
                     </div>

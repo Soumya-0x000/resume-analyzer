@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 import { useGenerateInterviewReport } from "../services/interview.queries";
-import { inputFormSchema } from "../components/home.helpers";
+import { inputFormSchema } from "../utils/home.helpers";
 import AboutYouCard from "../components/AboutYouCard";
 import JobDescriptionCard from "../components/JobDescriptionCard";
 import ResumeUploadCard from "../components/ResumeUploadCard";

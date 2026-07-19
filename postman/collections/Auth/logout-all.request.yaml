@@ -1,5 +1,0 @@
-$kind: http-request
-name: logout-all
-url: "{{base_url}}/auth/logout-all"
-method: POST
-order: 4503238739740198

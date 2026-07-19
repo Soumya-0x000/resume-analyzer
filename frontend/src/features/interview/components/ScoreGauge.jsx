@@ -1,14 +1,13 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
-import { getScoreConfig } from "./report.helpers";
+import { getScoreConfig } from "../utils/report.helpers";
 
 const SCORE_HEX = { high: "#22c55e", medium: "#f59e0b", low: "#ef4444" };
 
 const ScoreGauge = ({ score }) => {
     const pct = Math.round((score ?? 0) * 100);
     const cfg = getScoreConfig(score ?? 0);
-    const fill =
-        score >= 0.7 ? SCORE_HEX.high : score >= 0.4 ? SCORE_HEX.medium : SCORE_HEX.low;
+    const fill = score >= 0.7 ? SCORE_HEX.high : score >= 0.4 ? SCORE_HEX.medium : SCORE_HEX.low;
 
     const data = [
         { value: pct, fill },
@@ -38,9 +37,7 @@ const ScoreGauge = ({ score }) => {
                     </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={cn("text-5xl font-bold tabular-nums", cfg.text)}>
-                        {pct}
-                    </span>
+                    <span className={cn("text-5xl font-bold tabular-nums", cfg.text)}>{pct}</span>
                     <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
                         Match %
                     </span>

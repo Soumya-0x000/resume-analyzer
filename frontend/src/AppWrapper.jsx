@@ -6,7 +6,7 @@ import { Outlet } from 'react-router';
 
 export const AppWrapper = () => (
     <ThemeProvider>
-        <Toaster richColors position="top-left" closeButton />
+        <Toaster richColors position="bottom-left" closeButton  />
         <QueryProvider>
             <AuthProvider>
                 <Outlet />

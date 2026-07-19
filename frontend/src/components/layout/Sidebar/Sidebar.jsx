@@ -3,8 +3,9 @@ import { Brain, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { NAV_BOTTOM, NAV_MAIN } from '@/config/nav.config'
+import { NAV_MAIN } from '@/config/nav.config'
 import { SidebarNavItem } from './SidebarNavItem'
+import { SidebarLogoutItem } from './SidebarLogoutItem'
 
 export function Sidebar({ collapsed, onToggle }) {
     return (
@@ -44,9 +45,7 @@ export function Sidebar({ collapsed, onToggle }) {
 
                 {/* Bottom nav */}
                 <nav className="flex flex-col gap-0.5 p-2">
-                    {NAV_BOTTOM.map((item) => (
-                        <SidebarNavItem key={item.key} item={item} collapsed={collapsed} />
-                    ))}
+                    <SidebarLogoutItem collapsed={collapsed} />
                 </nav>
 
                 {/* Collapse toggle */}

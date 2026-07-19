@@ -15,7 +15,7 @@ import {
     formatDate,
     getDateFromObjectId,
     getScoreConfig,
-} from "./report.helpers";
+} from "../utils/report.helpers";
 
 const ReportCard = ({ report }) => {
     const navigate = useNavigate();
@@ -74,6 +74,8 @@ const ReportCard = ({ report }) => {
                     </div>
                 )}
 
+                <div className="mt-auto" />
+
                 <Separator />
 
                 <div className="flex items-center justify-between">
@@ -98,9 +100,7 @@ const ReportCard = ({ report }) => {
                         variant="ghost"
                         size="xs"
                         className="shrink-0 gap-0.5 text-xs"
-                        onClick={() =>
-                            navigate(`/reports/${report._id}`, { state: { report } })
-                        }
+                        onClick={() => navigate(`/reports/${report._id}`, { state: { report } })}
                     >
                         View
                         <ChevronRight className="h-3 w-3" />

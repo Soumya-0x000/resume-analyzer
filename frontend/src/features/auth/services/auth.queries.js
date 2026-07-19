@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { login, register, checkUsernameOrEmail, logout, getMe, updateMe } from './auth.api';
+import { login, register, checkUsernameOrEmail, logout, getMe, updateMe, recoverPassword } from './auth.api';
 
 const authKey = ['auth', 'me'];
 
@@ -63,5 +63,14 @@ export function useLogout() {
         onSuccess: () => {
             queryClient.setQueryData(authKey, null);
         },
+    });
+}
+
+export function useRecoverPassword() {
+    return useMutation({
+        mutationFn: recoverPassword,
+        onSuccess: () => {
+            // Optionally, you can add any success handling logic here, such as showing a success message or redirecting the user.
+        }
     });
 }

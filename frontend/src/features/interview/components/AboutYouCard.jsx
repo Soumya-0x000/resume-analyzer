@@ -2,7 +2,7 @@ import { User, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { MAX_SELF_DESC } from "./home.helpers";
+import { MAX_SELF_DESC } from "../utils/home.helpers";
 
 const AboutYouCard = ({ register, errors, selfDescValue }) => (
     <Card className="flex flex-col min-h-0 overflow-hidden">

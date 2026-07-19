@@ -1,4 +1,5 @@
-import { LogOut, Settings, UserRound } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
+import { useNavigate } from "react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,18 +14,11 @@ import {
 import { useAuth } from "@/context/auth/useAuth";
 import { useLogout } from "@/features/auth/services/auth.queries";
 import { Button } from "@/components/ui/button";
-
-function getInitials(str) {
-    if (!str) return "?";
-    return str
-        .split(/[\s_.-]+/)
-        .slice(0, 2)
-        .map((w) => w[0]?.toUpperCase() ?? "")
-        .join("");
-}
+import { getInitials } from "@/lib/utils";
 
 export function AccountMenu() {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const { mutate: logoutUser } = useLogout();
 
     const displayName = user?.username || user?.name || "User";
@@ -71,13 +65,9 @@ export function AccountMenu() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                    <DropdownMenuItem className="rounded-none">
+                    <DropdownMenuItem className="rounded-none" onSelect={() => navigate("/profile")}>
                         <UserRound />
                         Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="rounded-none">
-                        <Settings />
-                        Settings
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
 

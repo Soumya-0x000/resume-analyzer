@@ -364,3 +364,10 @@ input:-webkit-autofill:active {
 
     transition: background-color 9999s ease-in-out 0s;
 }
+
+*button {
+    cursor: pointer;
+}
+*button:disabled {
+    cursor: not-allowed;
+}
