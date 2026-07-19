@@ -67,3 +67,7 @@ coverage/
 # pnpm / lock safety (keep lock, ignore only if needed)
 # ========================
 # (DO NOT ignore pnpm-lock.yaml in normal projects)
+
+.claude/
+postman/
+.postman/

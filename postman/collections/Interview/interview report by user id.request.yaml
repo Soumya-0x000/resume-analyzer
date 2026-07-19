@@ -1,5 +1,0 @@
-$kind: http-request
-name: interview report by user id
-url: "{{base_url}}/interview/report/6a15cfc4571f933871873958"
-method: GET
-order: 3835120372296173

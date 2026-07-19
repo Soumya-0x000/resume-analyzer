@@ -1,5 +1,0 @@
-$kind: http-request
-name: refresh
-url: "{{base_url}}/auth/refresh-token"
-method: POST
-order: 4308690553919260
