@@ -353,21 +353,69 @@ const getMeController = async (req, res) => {
 };
 
 /**
- * @route PUT /api/auth/me
+ * @route PATCH /api/auth/update-me
  * @name updateMeController
- * @description Update current user
+ * @description Update current user's profile (username, email, avatar) and/or password
  * @access Private
  */
 const updateMeController = async (req, res) => {
     try {
-        const { username, email } = req.body;
+        const { username, email, avatar, currentPassword, newPassword } = req.body;
+        console.log(username)
         const user = await UserModel.findById(req.user.id);
-        if (username) user.username = username;
-        if (email) user.email = email;
+
+        if (!user) {
+            return sendError(res, { status: 404, message: "User not found" });
+        }
+
+        if (username && username !== user.username) {
+            const existing = await UserModel.findOne({ username }).collation({
+                locale: "en",
+                strength: 2,
+            });
+            if (existing && String(existing._id) !== String(user._id)) {
+                return sendError(res, { status: 400, message: "Username already taken" });
+            }
+            user.username = username;
+        }
+
+        if (email && email.toLowerCase() !== user.email) {
+            const existing = await UserModel.findOne({ email: email.toLowerCase() });
+            if (existing && String(existing._id) !== String(user._id)) {
+                return sendError(res, { status: 400, message: "Email already registered" });
+            }
+            user.email = email;
+        }
+
+        if (typeof avatar === "string") {
+            const approxBytes = (avatar.length * 3) / 4;
+            if (approxBytes > 2 * 1024 * 1024) {
+                return sendError(res, { status: 400, message: "Avatar image is too large (max 2MB)" });
+            }
+            user.avatar = avatar;
+        }
+
+        if (newPassword) {
+            if (!currentPassword) {
+                return sendError(res, { status: 400, message: "Current password is required" });
+            }
+            const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+            if (!isPasswordValid) {
+                return sendError(res, { status: 400, message: "Current password is incorrect" });
+            }
+            if (newPassword.length < 6) {
+                return sendError(res, {
+                    status: 400,
+                    message: "New password must be at least 6 characters",
+                });
+            }
+            user.password = await bcrypt.hash(newPassword, 10);
+        }
+
         await user.save();
         sendResponse(res, {
             status: 200,
-            message: "User updated successfully",
+            message: "Profile updated successfully",
             data: sanitizeUser(user),
         });
     } catch (error) {
@@ -384,6 +432,7 @@ const updateMeController = async (req, res) => {
 const recoverPassword = async (req, res) => {
     try {
         const { email } = req.body;
+        console.log(email)
         const user = await UserModel.findOne({ email });
         if (!user) {
             return sendError(res, { status: 401, message: "Invalid email" });

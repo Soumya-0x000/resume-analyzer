@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { getScoreConfig } from "./report.helpers";
+import { getScoreConfig } from "../utils/report.helpers";
 
 const CircularScore = ({ score }) => {
     const r = 22;
@@ -10,9 +10,18 @@ const CircularScore = ({ score }) => {
     return (
         <div className="relative flex shrink-0 items-center justify-center">
             <svg width="60" height="60" viewBox="0 0 60 60">
-                <circle cx="30" cy="30" r={r} fill="none" className="stroke-muted" strokeWidth="4" />
                 <circle
-                    cx="30" cy="30" r={r}
+                    cx="30"
+                    cy="30"
+                    r={r}
+                    fill="none"
+                    className="stroke-muted"
+                    strokeWidth="4"
+                />
+                <circle
+                    cx="30"
+                    cy="30"
+                    r={r}
                     fill="none"
                     className={cfg.stroke}
                     strokeWidth="4"
@@ -22,9 +31,7 @@ const CircularScore = ({ score }) => {
                     transform="rotate(-90 30 30)"
                 />
             </svg>
-            <span className={cn("absolute text-xs font-bold tabular-nums", cfg.text)}>
-                {pct}%
-            </span>
+            <span className={cn("absolute text-xs font-bold tabular-nums", cfg.text)}>{pct}%</span>
         </div>
     );
 };

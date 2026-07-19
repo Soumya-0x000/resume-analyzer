@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
-import Login from "@/features/auth/Login";
-import Register from "@/features/auth/Register";
+import Login from "@/features/auth/pages/Login";
+import Register from "@/features/auth/pages/Register";
 import { AppWrapper } from "@/AppWrapper";
 import { PublicRoute } from "./PublicRoute";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -9,6 +9,7 @@ import NotFound from "@/pages/NotFound";
 import Home from "@/features/interview/pages/Home";
 import Interview from "@/features/interview/pages/Interview";
 import ReportDetail from "@/features/interview/pages/ReportDetail";
+import Profile from "@/features/auth/pages/Profile";
 
 const routes = [
     {
@@ -38,6 +39,7 @@ const routes = [
                             { index: true, element: <Home /> },
                             { path: "reports", element: <Interview /> },
                             { path: "reports/:reportId", element: <ReportDetail /> },
+                            { path: "profile", element: <Profile /> },
                         ],
                     },
                 ],

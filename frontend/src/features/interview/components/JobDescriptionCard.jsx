@@ -2,7 +2,7 @@ import { Briefcase, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { MAX_JOB_DESC } from "./home.helpers";
+import { MAX_JOB_DESC } from "../utils/home.helpers";
 
 const JobDescriptionCard = ({ register, errors, jobDescValue }) => (
     <Card className="col-start-1 row-start-1 row-span-2 flex flex-col min-h-0 overflow-hidden">

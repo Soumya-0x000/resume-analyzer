@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router';
-import { AuthPageShell } from './components/AuthPageShell';
-import { LoginForm } from './components/LoginForm';
+import { AuthPageShell } from '../components/AuthPageShell';
+import { LoginForm } from '../components/LoginForm';
 
 const Login = memo(() => {
     const navigate = useNavigate();

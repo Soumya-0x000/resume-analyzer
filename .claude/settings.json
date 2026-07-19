@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /tmp)",
+      "Bash(curl -s -c cookies.txt -X POST __TRACKED_VAR__/auth/register -H 'Content-Type: application/json' -d '{\"username\":\"__TRACKED_VAR__\",\"email\":\"__TRACKED_VAR__\",\"password\":\"secret123\"}')",
+      "Bash(curl -s -b cookies.txt -X PATCH __TRACKED_VAR__/auth/update-me -H 'Content-Type: application/json' -d '{\"username\":\"verifyuser_renamed\",\"email\":\"renamed_verify@example.com\",\"avatar\":\"__TRACKED_VAR__\"}')",
+      "Bash(curl -s -b cookies.txt __TRACKED_VAR__/auth/get-me)",
+      "Bash(curl -s -o resp.json -w 'HTTP %{http_code}\\\\n' -b cookies.txt -X PATCH __TRACKED_VAR__/auth/update-me -H 'Content-Type: application/json' -d '{\"currentPassword\":\"wrongpass\",\"newPassword\":\"newsecret123\"}')",
+      "Bash(curl -s -o resp2.json -w 'HTTP %{http_code}\\\\n' -b cookies.txt -X PATCH __TRACKED_VAR__/auth/update-me -H 'Content-Type: application/json' -d '{\"newPassword\":\"newsecret123\"}')",
+      "Bash(curl -s -o resp3.json -w 'HTTP %{http_code}\\\\n' -b cookies.txt -X PATCH __TRACKED_VAR__/auth/update-me -H 'Content-Type: application/json' -d '{\"currentPassword\":\"secret123\",\"newPassword\":\"newsecret123\"}')",
+      "Bash(curl -s -o resp4.json -w 'HTTP %{http_code}\\\\n' -X POST __TRACKED_VAR__/auth/login -H 'Content-Type: application/json' -d '{\"identifier\":\"verifyuser_renamed\",\"password\":\"secret123\"}')",
+      "Bash(curl -s -c cookies2.txt -X POST __TRACKED_VAR__/auth/register -H 'Content-Type: application/json' -d '{\"username\":\"seconduser_verify\",\"email\":\"second_verify@example.com\",\"password\":\"secret123\"}')",
+      "Bash(curl -s -o resp6.json -w 'HTTP %{http_code}\\\\n' -b cookies2.txt -X PATCH __TRACKED_VAR__/auth/update-me -H 'Content-Type: application/json' -d '{\"username\":\"verifyuser_renamed\"}')",
+      "Bash(curl -s -o resp7.json -w 'HTTP %{http_code}\\\\n' -b cookies2.txt -X PATCH __TRACKED_VAR__/auth/update-me -H 'Content-Type: application/json' -d '{\"email\":\"renamed_verify@example.com\"}')",
+      "Bash(python3 -c \"print\\('data:image/png;base64,' + 'A'*2900000\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -o resp8.json -w 'HTTP %{http_code}\\\\n' -b cookies2.txt -X PATCH __TRACKED_VAR__/auth/update-me -H 'Content-Type: application/json' --data-binary @big_body.json)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:5183/)",
+      "Bash(cat /tmp/frontend.log | tail -30)",
+      "Bash(curl -s -c cookiesR.txt -X POST __TRACKED_VAR__/auth/register -H 'Content-Type: application/json' -d '{\"username\":\"refreshtest__TRACKED_VAR__\",\"email\":\"refreshtest__TRACKED_VAR__@example.com\",\"password\":\"secret123\"}')",
+      "Bash(curl -s -b cookiesR.txt -X POST __TRACKED_VAR__/auth/refresh-token)",
+      "Bash(curl -s -o /dev/null -w 'HTTP %{http_code}\\\\n' -c cookiesF.txt -X POST __TRACKED_VAR__/auth/register -H 'Content-Type: application/json' -d '{\"username\":\"foldertest__TRACKED_VAR__\",\"email\":\"foldertest__TRACKED_VAR__@example.com\",\"password\":\"secret123\"}')",
+      "Bash(curl -s -o /dev/null -w 'HTTP %{http_code}\\\\n' -b cookiesF.txt __TRACKED_VAR__/auth/get-me)",
+      "Bash(curl -s -b cookiesF.txt '__TRACKED_VAR__/interview/report/000000000000000000000000?page=1&offset=6' -w '\\\\nHTTP %{http_code}\\\\n')"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import multer from 'multer';
+import multer from "multer";
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -6,19 +6,22 @@ const upload = multer({
         fileSize: 1024 * 1024 * 5,
     },
     fileFilter: (req, file, cb) => {
-        const allowedExtensions = ['pdf'];
+        const allowedExtensions = ["pdf"];
         const allowedMimeTypes = [
-            'application/pdf',
-            'application/x-pdf',
-            'application/octet-stream',
+            "application/pdf",
+            "application/x-pdf",
+            "application/octet-stream",
         ];
-        const fileExtension = file.originalname.split('.').pop().toLowerCase();
+        const fileExtension = file.originalname.split(".").pop().toLowerCase();
         const fileMimetype = file.mimetype;
-
+        console.log(
+            allowedExtensions.includes(fileExtension),
+            allowedMimeTypes.includes(fileMimetype),
+        );
         if (allowedExtensions.includes(fileExtension) && allowedMimeTypes.includes(fileMimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('Invalid file type'));
+            cb(new Error("Invalid file type"));
         }
     },
 });

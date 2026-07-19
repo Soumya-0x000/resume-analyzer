@@ -1,4 +1,4 @@
-import { generateInterviewReport } from "../service/ai.service.js";
+import { generateInterviewReport } from "../services/ai.service.js";
 import InterviewReportModel from "../models/interviewReport.model.js";
 import { sendResponse } from "../lib/sendResponse.js";
 import { sendError } from "../lib/sendError.js";

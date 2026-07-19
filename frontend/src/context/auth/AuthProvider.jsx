@@ -66,8 +66,8 @@ export const AuthProvider = ({ children }) => {
                 if (!isRefreshing) {
                     isRefreshing = true;
                     try {
-                        const response = await authApi.post('/auth/refresh');
-                        const newToken = response.data.accessToken;
+                        const response = await authApi.post('/auth/refresh-token');
+                        const newToken = response.data.data.accessToken;
 
                         setAuthToken(newToken);
                         config.headers.Authorization = `Bearer ${newToken}`;
@@ -116,8 +116,8 @@ export const AuthProvider = ({ children }) => {
                     isRefreshing = true;
 
                     try {
-                        const response = await authApi.post('/auth/refresh');
-                        const newToken = response.data.accessToken;
+                        const response = await authApi.post('/auth/refresh-token');
+                        const newToken = response.data.data.accessToken;
 
                         setAuthToken(newToken);
                         originalRequest.headers.Authorization = `Bearer ${newToken}`;

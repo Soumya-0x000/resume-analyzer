@@ -1,7 +1,7 @@
 import { CheckCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { STEPS } from "./home.helpers";
+import { STEPS } from "../utils/home.helpers";
 
 const StepsPanel = ({ completedFields, isPending, isValid }) => (
     <div className="col-start-3 row-start-1 row-span-2 flex flex-col justify-end gap-2 pb-1">
