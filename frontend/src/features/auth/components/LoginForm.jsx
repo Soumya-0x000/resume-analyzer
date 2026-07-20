@@ -42,8 +42,6 @@ export function LoginForm({ onSwitch }) {
         [loginUser],
     );
 
-    
-
     const showIdErr = (touchedFields.identifier || dirtyFields.identifier) && errors.identifier;
     const showPwErr = (touchedFields.password || dirtyFields.password) && errors.password;
 
@@ -98,7 +96,7 @@ export function LoginForm({ onSwitch }) {
                                 "Please enter your username or email for password recovery:",
                             );
                             if (identifier) {
-                                recoverPswd({ identifier })
+                                recoverPswd({ email: identifier })
                                     .then((res) => {
                                         toast.success(
                                             res?.data?.message || "Password recovery email sent!",

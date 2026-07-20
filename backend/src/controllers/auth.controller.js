@@ -432,7 +432,7 @@ const updateMeController = async (req, res) => {
 const recoverPassword = async (req, res) => {
     try {
         const { email } = req.body;
-        console.log(email)
+        console.log(req.body)
         const user = await UserModel.findOne({ email });
         if (!user) {
             return sendError(res, { status: 401, message: "Invalid email" });
